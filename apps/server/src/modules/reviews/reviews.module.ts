@@ -9,5 +9,6 @@ import { ReviewsService } from './reviews.service';
   imports: [DeliveryModule, UsersModule],
   controllers: [ReviewsController],
   providers: [ReviewsRepository, ReviewsService],
+  exports: [ReviewsService],
 })
 export class ReviewsModule {}

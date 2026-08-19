@@ -13,6 +13,11 @@ import { UsersService } from './users.service';
     UsersQueryService,
     UsersRatingService,
   ],
-  exports: [UsersQueryService, UsersRepository, UsersRatingService],
+  exports: [
+    UsersService,
+    UsersQueryService,
+    UsersRepository,
+    UsersRatingService,
+  ],
 })
 export class UsersModule {}

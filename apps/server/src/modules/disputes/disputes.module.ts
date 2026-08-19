@@ -8,5 +8,6 @@ import { DisputesService } from './disputes.service';
   imports: [DeliveryModule],
   controllers: [DisputesController],
   providers: [DisputesRepository, DisputesService],
+  exports: [DisputesService],
 })
 export class DisputesModule {}
