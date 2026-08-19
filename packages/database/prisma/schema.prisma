@@ -1,0 +1,472 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserProfileType {
+  SENDER
+  TRAVELER
+  BOTH
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum JourneyStatus {
+  UPCOMING
+  IN_TRANSIT
+  COMPLETED
+  CANCELLED
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  DISPUTED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  HELD_IN_ESCROW
+  RELEASED
+  REFUNDED
+  FAILED
+}
+
+enum PaymentMethodType {
+  CARD
+  MOBILE_MONEY
+  MPESA
+  USDT
+  WALLET
+}
+
+enum NotificationChannel {
+  PUSH
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum FileStatus {
+  PENDING
+  UPLOADED
+  DELETED
+}
+
+// ─── RBAC (auth module) ──────────────────────────────────────────────────────
+
+model Permission {
+  id          String           @id @default(uuid()) @db.Uuid
+  name        String           @unique
+  resource    String
+  action      String
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  @@unique([resource, action])
+  @@map("permissions")
+}
+
+model Role {
+  id          String           @id @default(uuid()) @db.Uuid
+  name        String           @unique
+  description String?
+  isSystem    Boolean          @default(false) @map("is_system")
+  permissions RolePermission[]
+  users       UserRole[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  @@map("roles")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id") @db.Uuid
+  permissionId String     @map("permission_id") @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  grantedAt DateTime @default(now()) @map("granted_at")
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// ─── Users module ────────────────────────────────────────────────────────────
+
+model User {
+  id            String          @id @default(uuid()) @db.Uuid
+  email         String          @unique
+  phoneNumber   String?         @unique @map("phone_number")
+  passwordHash  String          @map("password_hash")
+  firstName     String          @map("first_name")
+  lastName      String          @map("last_name")
+  profileType   UserProfileType @default(SENDER) @map("profile_type")
+  profilePhotoUrl String?       @map("profile_photo_url")
+  countryCode   String?         @map("country_code") @db.Char(2)
+  dateOfBirth   DateTime?       @map("date_of_birth") @db.Date
+  isActive      Boolean         @default(true) @map("is_active")
+  ratingAvg     Decimal         @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount   Int             @default(0) @map("rating_count")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  roles              UserRole[]
+  verifications      UserVerification[]
+  addresses          Address[]
+  wallet             Wallet?
+  paymentMethods     PaymentMethod[]
+  journeys           Journey[]              @relation("TravelerJourneys")
+  sentRequests       DeliveryRequest[]      @relation("SenderRequests")
+  travelerRequests   DeliveryRequest[]      @relation("TravelerRequests")
+  statusEvents       DeliveryStatusEvent[]
+  payerTransactions  Transaction[]          @relation("PayerTransactions")
+  payeeTransactions  Transaction[]          @relation("PayeeTransactions")
+  reviewsGiven       Review[]               @relation("ReviewsGiven")
+  reviewsReceived    Review[]               @relation("ReviewsReceived")
+  messages           Message[]
+  disputesRaised     Dispute[]              @relation("DisputesRaised")
+  disputesResolved   Dispute[]              @relation("DisputesResolved")
+  notifications      Notification[]
+  files              File[]
+  refreshTokens      RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model UserVerification {
+  id             String             @id @default(uuid()) @db.Uuid
+  userId         String             @map("user_id") @db.Uuid
+  idDocumentType String?            @map("id_document_type")
+  idDocumentUrl  String?            @map("id_document_url")
+  selfieUrl      String?            @map("selfie_url")
+  status         VerificationStatus @default(UNVERIFIED)
+  reviewedById   String?            @map("reviewed_by_id") @db.Uuid
+  reviewedAt     DateTime?          @map("reviewed_at")
+  rejectionReason String?           @map("rejection_reason")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_verifications")
+}
+
+model Address {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  label       String?
+  line1       String
+  line2       String?
+  city        String
+  countryCode String   @map("country_code") @db.Char(2)
+  postalCode  String?  @map("postal_code")
+  latitude    Decimal? @db.Decimal(9, 6)
+  longitude   Decimal? @db.Decimal(9, 6)
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  pickupRequests  DeliveryRequest[] @relation("PickupAddress")
+  dropoffRequests DeliveryRequest[] @relation("DropoffAddress")
+
+  @@map("addresses")
+}
+
+// ─── Storage module ──────────────────────────────────────────────────────────
+
+model File {
+  id           String     @id @default(uuid()) @db.Uuid
+  key          String     @unique
+  bucket       String
+  originalName String     @map("original_name")
+  mimeType     String     @map("mime_type")
+  sizeBytes    Int        @map("size_bytes")
+  status       FileStatus @default(PENDING)
+  ownerId      String?    @map("owner_id") @db.Uuid
+  module       String
+  entityType   String?    @map("entity_type")
+  entityId     String?    @map("entity_id") @db.Uuid
+  createdAt    DateTime   @default(now()) @map("created_at")
+  owner        User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@index([module, entityType, entityId])
+  @@map("files")
+}
+
+// ─── Payments module ─────────────────────────────────────────────────────────
+
+model Wallet {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  currency  String   @default("USD") @db.Char(3)
+  balance   Decimal  @default(0) @db.Decimal(12, 2)
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("wallets")
+}
+
+model PaymentMethod {
+  id          String            @id @default(uuid()) @db.Uuid
+  userId      String            @map("user_id") @db.Uuid
+  methodType  PaymentMethodType @map("method_type")
+  providerRef String?           @map("provider_ref")
+  isDefault   Boolean           @default(false) @map("is_default")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payment_methods")
+}
+
+model Transaction {
+  id                String            @id @default(uuid()) @db.Uuid
+  deliveryRequestId String            @map("delivery_request_id") @db.Uuid
+  payerId           String            @map("payer_id") @db.Uuid
+  payeeId           String?           @map("payee_id") @db.Uuid
+  amount            Decimal           @db.Decimal(12, 2)
+  platformFee       Decimal           @default(0) @map("platform_fee") @db.Decimal(12, 2)
+  currency          String            @default("USD") @db.Char(3)
+  method            PaymentMethodType
+  status            PaymentStatus     @default(PENDING)
+  providerReference String?           @map("provider_reference")
+  heldAt            DateTime?         @map("held_at")
+  releasedAt        DateTime?         @map("released_at")
+  refundedAt        DateTime?         @map("refunded_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  deliveryRequest   DeliveryRequest   @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+  payer             User              @relation("PayerTransactions", fields: [payerId], references: [id])
+  payee             User?             @relation("PayeeTransactions", fields: [payeeId], references: [id])
+
+  @@index([deliveryRequestId])
+  @@map("transactions")
+}
+
+// ─── Journeys module ─────────────────────────────────────────────────────────
+
+model Journey {
+  id                  String        @id @default(uuid()) @db.Uuid
+  travelerId          String        @map("traveler_id") @db.Uuid
+  originCountry       String        @map("origin_country") @db.Char(2)
+  originCity          String        @map("origin_city")
+  destinationCountry  String        @map("destination_country") @db.Char(2)
+  destinationCity     String        @map("destination_city")
+  departureDate       DateTime      @map("departure_date") @db.Date
+  arrivalDate         DateTime      @map("arrival_date") @db.Date
+  flightNumber        String?       @map("flight_number")
+  availableWeightKg   Decimal       @map("available_weight_kg") @db.Decimal(6, 2)
+  pricePerKg          Decimal?      @map("price_per_kg") @db.Decimal(10, 2)
+  currency            String        @default("USD") @db.Char(3)
+  notes               String?
+  status              JourneyStatus @default(UPCOMING)
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  traveler            User          @relation("TravelerJourneys", fields: [travelerId], references: [id], onDelete: Cascade)
+  deliveryRequests    DeliveryRequest[]
+
+  @@index([originCountry, destinationCountry, departureDate])
+  @@map("journeys")
+}
+
+// ─── Delivery module ─────────────────────────────────────────────────────────
+
+model ItemCategory {
+  id           Int               @id @default(autoincrement())
+  name         String            @unique
+  isRestricted Boolean           @default(false) @map("is_restricted")
+  description  String?
+  requests     DeliveryRequest[]
+
+  @@map("item_categories")
+}
+
+model DeliveryRequest {
+  id               String        @id @default(uuid()) @db.Uuid
+  senderId         String        @map("sender_id") @db.Uuid
+  journeyId        String        @map("journey_id") @db.Uuid
+  travelerId       String        @map("traveler_id") @db.Uuid
+  itemCategoryId   Int?          @map("item_category_id")
+  itemDescription  String        @map("item_description")
+  itemWeightKg     Decimal       @map("item_weight_kg") @db.Decimal(6, 2)
+  declaredValue    Decimal?      @map("declared_value") @db.Decimal(12, 2)
+  pickupAddressId  String?       @map("pickup_address_id") @db.Uuid
+  dropoffAddressId String?       @map("dropoff_address_id") @db.Uuid
+  recipientName    String?       @map("recipient_name")
+  recipientPhone   String?       @map("recipient_phone")
+  agreedPrice      Decimal       @map("agreed_price") @db.Decimal(10, 2)
+  currency         String        @default("USD") @db.Char(3)
+  status           RequestStatus @default(PENDING)
+  pickupPhotoUrl   String?       @map("pickup_photo_url")
+  deliveryPhotoUrl String?       @map("delivery_photo_url")
+  pickupConfirmedAt DateTime?    @map("pickup_confirmed_at")
+  deliveredAt      DateTime?     @map("delivered_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  sender         User                  @relation("SenderRequests", fields: [senderId], references: [id])
+  journey        Journey               @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  traveler       User                  @relation("TravelerRequests", fields: [travelerId], references: [id])
+  itemCategory   ItemCategory?         @relation(fields: [itemCategoryId], references: [id])
+  pickupAddress  Address?              @relation("PickupAddress", fields: [pickupAddressId], references: [id])
+  dropoffAddress Address?              @relation("DropoffAddress", fields: [dropoffAddressId], references: [id])
+  statusEvents   DeliveryStatusEvent[]
+  transactions   Transaction[]
+  insurance      InsurancePolicy?
+  reviews        Review[]
+  messages       Message[]
+  disputes       Dispute[]
+
+  @@index([senderId])
+  @@index([travelerId])
+  @@index([status])
+  @@map("delivery_requests")
+}
+
+model DeliveryStatusEvent {
+  id                String        @id @default(uuid()) @db.Uuid
+  deliveryRequestId String        @map("delivery_request_id") @db.Uuid
+  status            RequestStatus
+  note              String?
+  changedById       String?       @map("changed_by_id") @db.Uuid
+  createdAt         DateTime      @default(now()) @map("created_at")
+  deliveryRequest   DeliveryRequest @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+  changedBy         User?         @relation(fields: [changedById], references: [id])
+
+  @@map("delivery_status_events")
+}
+
+model InsurancePolicy {
+  id                String          @id @default(uuid()) @db.Uuid
+  deliveryRequestId String          @unique @map("delivery_request_id") @db.Uuid
+  coverageAmount    Decimal         @map("coverage_amount") @db.Decimal(12, 2)
+  premium           Decimal         @db.Decimal(10, 2)
+  provider          String?
+  policyReference   String?         @map("policy_reference")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  deliveryRequest   DeliveryRequest @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+
+  @@map("insurance_policies")
+}
+
+// ─── Reviews module ──────────────────────────────────────────────────────────
+
+model Review {
+  id                String          @id @default(uuid()) @db.Uuid
+  deliveryRequestId String          @map("delivery_request_id") @db.Uuid
+  reviewerId        String          @map("reviewer_id") @db.Uuid
+  revieweeId        String          @map("reviewee_id") @db.Uuid
+  rating            Int
+  comment           String?
+  createdAt         DateTime        @default(now()) @map("created_at")
+  deliveryRequest   DeliveryRequest @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+  reviewer          User            @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewee          User            @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+
+  @@unique([deliveryRequestId, reviewerId])
+  @@map("reviews")
+}
+
+// ─── Messaging module ────────────────────────────────────────────────────────
+
+model Message {
+  id                String          @id @default(uuid()) @db.Uuid
+  deliveryRequestId String          @map("delivery_request_id") @db.Uuid
+  senderId          String          @map("sender_id") @db.Uuid
+  body              String?
+  attachmentUrl     String?         @map("attachment_url")
+  readAt            DateTime?       @map("read_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  deliveryRequest   DeliveryRequest @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+  sender            User            @relation(fields: [senderId], references: [id])
+
+  @@index([deliveryRequestId, createdAt])
+  @@map("messages")
+}
+
+// ─── Disputes module ─────────────────────────────────────────────────────────
+
+model Dispute {
+  id                String          @id @default(uuid()) @db.Uuid
+  deliveryRequestId String          @map("delivery_request_id") @db.Uuid
+  raisedById        String          @map("raised_by_id") @db.Uuid
+  reason            String
+  status            DisputeStatus   @default(OPEN)
+  resolution        String?
+  resolvedById      String?         @map("resolved_by_id") @db.Uuid
+  resolvedAt        DateTime?       @map("resolved_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  deliveryRequest   DeliveryRequest @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+  raisedBy          User            @relation("DisputesRaised", fields: [raisedById], references: [id])
+  resolvedBy        User?           @relation("DisputesResolved", fields: [resolvedById], references: [id])
+
+  @@map("disputes")
+}
+
+// ─── Notifications module ────────────────────────────────────────────────────
+
+model Notification {
+  id        String              @id @default(uuid()) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  channel   NotificationChannel
+  title     String
+  body      String?
+  isRead    Boolean             @default(false) @map("is_read")
+  relatedId String?             @map("related_id") @db.Uuid
+  createdAt DateTime            @default(now()) @map("created_at")
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ─── Reference module ────────────────────────────────────────────────────────
+
+model Country {
+  code     String  @id @db.Char(2)
+  name     String
+  currency String? @db.Char(3)
+
+  @@map("countries")
+}

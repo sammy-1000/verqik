@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "title": "Verqik — Crowdshipping for the world",
+    "description": "Send packages with verified travelers. Secure escrow, real-time tracking, and routes across continents."
+  },
+  "header": {
+    "brand": "Verqik",
+    "tagline": "Crowdshipping",
+    "nav": [
+      { "label": "How it works", "href": "#how-it-works" },
+      { "label": "Routes", "href": "#routes" },
+      { "label": "Safety", "href": "#features" },
+      { "label": "Reviews", "href": "#testimonials" }
+    ],
+    "cta": { "label": "Get started", "href": "#cta" }
+  },
+  "footer": {
+    "brand": "Verqik",
+    "description": "Peer-to-peer delivery powered by real journeys. Send smarter, travel lighter.",
+    "columns": [
+      {
+        "title": "Product",
+        "links": [
+          { "label": "For senders", "href": "#" },
+          { "label": "For travelers", "href": "#" },
+          { "label": "Pricing", "href": "#" },
+          { "label": "Insurance", "href": "#" }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          { "label": "About", "href": "#" },
+          { "label": "Careers", "href": "#" },
+          { "label": "Press", "href": "#" },
+          { "label": "Contact", "href": "#" }
+        ]
+      },
+      {
+        "title": "Legal",
+        "links": [
+          { "label": "Terms", "href": "#" },
+          { "label": "Privacy", "href": "#" },
+          { "label": "Cookies", "href": "#" }
+        ]
+      }
+    ],
+    "legal": [
+      { "label": "© 2026 Verqik", "href": "#" },
+      { "label": "Status", "href": "#" }
+    ]
+  },
+  "blocks": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "tone": "normal",
+      "width": "content",
+      "data": {
+        "eyebrow": "Crowdshipping platform",
+        "title": "Send packages on journeys already heading your way",
+        "description": "Match with verified travelers flying your route. Funds stay in escrow until delivery is confirmed — faster than freight, smarter than couriers.",
+        "primaryCta": { "label": "Post a delivery", "href": "#cta" },
+        "secondaryCta": { "label": "List a journey", "href": "#routes" },
+        "badges": ["Escrow protected", "ID verified", "Live tracking"],
+        "image": {
+          "width": 640,
+          "height": 480,
+          "label": "Traveler with package",
+          "aspectRatio": "4/3"
+        }
+      }
+    },
+    {
+      "id": "logo-cloud",
+      "type": "logo-cloud",
+      "tone": "muted",
+      "width": "content",
+      "size": "compact",
+      "data": {
+        "title": "Trusted by senders and travelers across",
+        "logos": [
+          { "name": "Kigali" },
+          { "name": "Nairobi" },
+          { "name": "Lagos" },
+          { "name": "London" },
+          { "name": "Dubai" },
+          { "name": "New York" }
+        ]
+      }
+    },
+    {
+      "id": "stats",
+      "type": "stats",
+      "tone": "primary",
+      "width": "content",
+      "data": {
+        "title": "Growing every week",
+        "items": [
+          { "value": "12k+", "label": "Deliveries matched", "detail": "Last 90 days" },
+          { "value": "84", "label": "Countries connected", "detail": "Active routes" },
+          { "value": "4.9", "label": "Average rating", "detail": "From 3,200 reviews" },
+          { "value": "< 48h", "label": "Median match time", "detail": "Popular corridors" }
+        ]
+      }
+    },
+    {
+      "id": "features",
+      "type": "features",
+      "tone": "normal",
+      "width": "content",
+      "data": {
+        "eyebrow": "Why Verqik",
+        "title": "Built for trust at every mile",
+        "description": "From pickup photo to release of escrow — every step is logged, notified, and dispute-ready.",
+        "items": [
+          {
+            "icon": "shield",
+            "title": "Escrow payments",
+            "description": "Funds are held until the recipient confirms delivery. Travelers get paid, senders stay protected."
+          },
+          {
+            "icon": "badge-check",
+            "title": "Verified identities",
+            "description": "Government ID and selfie checks for travelers. Reputation scores follow every completed trip."
+          },
+          {
+            "icon": "messages",
+            "title": "Real-time chat",
+            "description": "Coordinate pickup windows and customs details in a dedicated thread per delivery."
+          },
+          {
+            "icon": "globe",
+            "title": "Global corridors",
+            "description": "Browse journeys by origin, destination, and available weight — match in minutes."
+          },
+          {
+            "icon": "camera",
+            "title": "Photo proof",
+            "description": "Pickup and drop-off photos timestamped and attached to the delivery timeline."
+          },
+          {
+            "icon": "scale",
+            "title": "Fair disputes",
+            "description": "Structured resolution when something goes wrong, with admin review and audit trail."
+          }
+        ]
+      }
+    },
+    {
+      "id": "how-it-works",
+      "type": "how-it-works",
+      "tone": "muted",
+      "width": "content",
+      "data": {
+        "eyebrow": "Simple flow",
+        "title": "How crowdshipping works",
+        "description": "Whether you're sending a gift or filling spare luggage weight — three steps to done.",
+        "steps": [
+          {
+            "step": 1,
+            "title": "Find or post a journey",
+            "description": "Travelers list upcoming flights with available kilograms. Senders search by route and date.",
+            "image": { "width": 400, "height": 280, "label": "Journey map", "aspectRatio": "10/7" }
+          },
+          {
+            "step": 2,
+            "title": "Match & lock escrow",
+            "description": "Agree on price, pay into escrow, and chat to arrange pickup before departure.",
+            "image": { "width": 400, "height": 280, "label": "Escrow flow", "aspectRatio": "10/7" }
+          },
+          {
+            "step": 3,
+            "title": "Deliver & get paid",
+            "description": "Traveler carries the item, uploads proof at arrival, and funds release automatically.",
+            "image": { "width": 400, "height": 280, "label": "Delivery handoff", "aspectRatio": "10/7" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "routes",
+      "type": "routes",
+      "tone": "normal",
+      "width": "content",
+      "data": {
+        "eyebrow": "Live journeys",
+        "title": "Popular routes this week",
+        "description": "Placeholder listings — real data will come from the journeys module.",
+        "items": [
+          {
+            "from": "KGL",
+            "to": "LHR",
+            "date": "Aug 24, 2026",
+            "price": "$12/kg",
+            "weight": "8 kg free",
+            "image": { "width": 320, "height": 200, "label": "KGL → LHR", "aspectRatio": "16/10" }
+          },
+          {
+            "from": "NBO",
+            "to": "DXB",
+            "date": "Aug 26, 2026",
+            "price": "$9/kg",
+            "weight": "5 kg free",
+            "image": { "width": 320, "height": 200, "label": "NBO → DXB", "aspectRatio": "16/10" }
+          },
+          {
+            "from": "LOS",
+            "to": "JFK",
+            "date": "Aug 29, 2026",
+            "price": "$15/kg",
+            "weight": "12 kg free",
+            "image": { "width": 320, "height": 200, "label": "LOS → JFK", "aspectRatio": "16/10" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "testimonials",
+      "type": "testimonials",
+      "tone": "secondary",
+      "width": "content",
+      "data": {
+        "eyebrow": "Community",
+        "title": "Stories from the corridor",
+        "items": [
+          {
+            "quote": "Sent wedding attire from Kigali to London in 3 days. Cheaper than DHL and I could chat with the traveler the whole way.",
+            "name": "Amara N.",
+            "role": "Sender · KGL → LHR",
+            "avatar": { "width": 48, "height": 48, "label": "AN", "aspectRatio": "1/1" }
+          },
+          {
+            "quote": "I fly Nairobi–Dubai monthly. Verqik pays for my extra baggage slot — verified senders, smooth handoffs at the airport.",
+            "name": "James O.",
+            "role": "Traveler · NBO → DXB",
+            "avatar": { "width": 48, "height": 48, "label": "JO", "aspectRatio": "1/1" }
+          },
+          {
+            "quote": "Escrow meant zero stress shipping samples to our NYC office. Dispute tools exist but we've never needed them.",
+            "name": "Lena K.",
+            "role": "Small business sender",
+            "avatar": { "width": 48, "height": 48, "label": "LK", "aspectRatio": "1/1" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "tone": "primary",
+      "width": "content",
+      "data": {
+        "title": "Ready to ship on someone's spare weight?",
+        "description": "Create a free account, browse open journeys, or list your next trip in under two minutes.",
+        "primaryCta": { "label": "Create account", "href": "#" },
+        "secondaryCta": { "label": "Browse journeys", "href": "#routes" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+node_modules
+.next
+dist
+coverage
+.git
+.gitignore
+**/*.md
+**/.env
+**/.env.*
+!**/.env.example
+**/terminals
+**/.turbo
+**/*.log
+apps/server/test
+**/.DS_Store
