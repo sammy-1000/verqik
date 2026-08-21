@@ -1,7 +1,20 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, RequirePermissions, type AuthUser } from '@verqik/common';
-import { CreateAdminUserDto, ListAdminUsersQueryDto } from './dto/admin-users.dto';
+import {
+  CreateAdminUserDto,
+  ListAdminUsersQueryDto,
+  UpdateAdminUserDto,
+} from './dto/admin-users.dto';
 import { AdminUsersService } from './admin-users.service';
 
 @ApiTags('admin')
@@ -13,12 +26,38 @@ export class AdminUsersController {
   @Get()
   @RequirePermissions('users:manage')
   list(@Query() query: ListAdminUsersQueryDto) {
-    return this.adminUsersService.list({ q: query.q });
+    return this.adminUsersService.list({
+      q: query.q,
+      page: query.page,
+      pageSize: query.pageSize,
+    });
+  }
+
+  @Get(':id')
+  @RequirePermissions('users:manage')
+  getById(@Param('id') id: string) {
+    return this.adminUsersService.getById(id);
   }
 
   @Post()
   @RequirePermissions('users:manage')
-  createAdmin(@CurrentUser() _user: AuthUser, @Body() dto: CreateAdminUserDto) {
-    return this.adminUsersService.createAdmin(dto);
+  create(@CurrentUser() _user: AuthUser, @Body() dto: CreateAdminUserDto) {
+    return this.adminUsersService.createUser(dto);
+  }
+
+  @Patch(':id')
+  @RequirePermissions('users:manage')
+  update(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateAdminUserDto,
+  ) {
+    return this.adminUsersService.updateUser(id, dto, user.id);
+  }
+
+  @Delete(':id')
+  @RequirePermissions('users:manage')
+  remove(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.adminUsersService.deleteUser(id, user.id);
   }
 }

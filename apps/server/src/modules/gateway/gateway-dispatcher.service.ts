@@ -368,10 +368,24 @@ export class GatewayDispatcherService {
 
     // Admin users
     h.set(GatewayEvents.ADMIN_USERS_LIST, (_u, p) =>
-      this.adminUsersService.list({ q: p.q as string | undefined }),
+      this.adminUsersService.list({
+        q: p.q as string | undefined,
+        page: p.page !== undefined ? Number(p.page) : undefined,
+        pageSize: p.pageSize !== undefined ? Number(p.pageSize) : undefined,
+      }),
+    );
+    h.set(GatewayEvents.ADMIN_USERS_GET, (_u, p) =>
+      this.adminUsersService.getById(String(p.userId)),
     );
     h.set(GatewayEvents.ADMIN_USERS_CREATE, (_u, p) =>
-      this.adminUsersService.createAdmin(p as never),
+      this.adminUsersService.createUser(p as never),
+    );
+    h.set(GatewayEvents.ADMIN_USERS_UPDATE, (u, p) => {
+      const { userId, ...dto } = p as { userId: string } & Record<string, unknown>;
+      return this.adminUsersService.updateUser(String(userId), dto as never, u.id);
+    });
+    h.set(GatewayEvents.ADMIN_USERS_DELETE, (u, p) =>
+      this.adminUsersService.deleteUser(String(p.userId), u.id),
     );
   }
 }

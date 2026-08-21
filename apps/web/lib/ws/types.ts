@@ -243,6 +243,7 @@ export interface AdminUserRecord {
   firstName: string;
   lastName: string;
   profileType: "SENDER" | "TRAVELER" | "BOTH";
+  profilePhotoUrl?: string | null;
   isActive: boolean;
   createdAt: string;
   roles: string[];
@@ -253,6 +254,14 @@ export interface AdminUserCreateResult extends AdminUserRecord {
   created: boolean;
   passwordUpdated: boolean;
   promoted: boolean;
+}
+
+export interface AdminUserListResult {
+  items: AdminUserRecord[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 export interface RequestUploadPayload {

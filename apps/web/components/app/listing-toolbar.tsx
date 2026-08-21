@@ -6,6 +6,56 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ListingViewMode } from "@/lib/hooks/use-listing-view";
 
+export function ListingPagination({
+  total,
+  page,
+  totalPages,
+  onPageChange,
+  className,
+}: {
+  total: number;
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center justify-between gap-3",
+        className,
+      )}
+    >
+      <p className="text-muted-foreground text-sm">
+        {total === 0 ? "No results" : `${total} result${total === 1 ? "" : "s"}`}
+        {totalPages > 1 ? ` · Page ${page} of ${totalPages}` : ""}
+      </p>
+      {totalPages > 1 ? (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+          >
+            Previous
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function ListingToolbar({
   viewMode,
   onViewModeChange,
