@@ -1,4 +1,5 @@
 import type { AuthUser } from '@verqik/common';
+import type { AppErrorBody } from '@verqik/common';
 
 export interface WsAuthUser extends AuthUser {
   socketId: string;
@@ -19,11 +20,7 @@ export interface RpcSuccess<T = unknown> {
 export interface RpcFailure {
   id: string;
   ok: false;
-  error: {
-    message: string;
-    status?: number;
-    code?: string;
-  };
+  error: AppErrorBody;
 }
 
 export type RpcResponse<T = unknown> = RpcSuccess<T> | RpcFailure;

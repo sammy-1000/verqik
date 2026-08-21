@@ -10,6 +10,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, RequirePermissions, type AuthUser } from '@verqik/common';
 import { CreateJourneyDto, SearchJourneysDto } from './dto/journeys.dto';
+import { UpdateJourneyTravelDto } from './dto/journey-travel.dto';
 import { JourneysService } from './journeys.service';
 
 @ApiTags('journeys')
@@ -28,6 +29,22 @@ export class JourneysController {
   @RequirePermissions('journeys:read')
   search(@Query() query: SearchJourneysDto) {
     return this.journeysService.search(query);
+  }
+
+  @Get('mine')
+  @RequirePermissions('journeys:read')
+  listMine(@CurrentUser() user: AuthUser) {
+    return this.journeysService.listMine(user.id);
+  }
+
+  @Patch(':id/travel')
+  @RequirePermissions('journeys:write')
+  updateTravel(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateJourneyTravelDto,
+  ) {
+    return this.journeysService.updateTravel(id, user.id, dto);
   }
 
   @Patch(':id/cancel')

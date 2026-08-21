@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { FileStatus } from '@verqik/database';
 import { StorageService } from '@verqik/storage';
 import { FilesRepository } from './files.repository';
 
@@ -64,15 +66,33 @@ export class FilesService {
     return this.repository.markUploaded(fileId);
   }
 
-  async getDownloadUrl(fileId: string, ownerId: string) {
+  async getDownloadUrl(fileId: string, userId: string) {
     const file = await this.repository.findById(fileId);
     if (!file) throw new NotFoundException('File not found');
-    if (file.ownerId && file.ownerId !== ownerId) {
+
+    const allowed = await this.canAccessFile(file, userId);
+    if (!allowed) {
       throw new ForbiddenException('Not your file');
     }
 
     const url = await this.storage.getPresignedDownloadUrl(file.key);
     return { url, file };
+  }
+
+  private async canAccessFile(
+    file: NonNullable<Awaited<ReturnType<FilesRepository['findById']>>>,
+    userId: string,
+  ) {
+    if (file.ownerId === userId) return true;
+
+    if (file.entityType === 'delivery_request' && file.entityId) {
+      const request = await this.repository.findDeliveryRequest(file.entityId);
+      if (request && (request.senderId === userId || request.travelerId === userId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   async delete(fileId: string, ownerId: string) {
@@ -84,5 +104,49 @@ export class FilesService {
 
     await this.storage.delete(file.key);
     return this.repository.markDeleted(fileId);
+  }
+
+  async assertOwnedUploadedFile(fileId: string, ownerId: string) {
+    const file = await this.repository.findById(fileId);
+    if (!file) throw new NotFoundException('File not found');
+    if (file.ownerId !== ownerId) {
+      throw new ForbiddenException('Not your file');
+    }
+    if (file.status !== FileStatus.UPLOADED) {
+      throw new BadRequestException('File upload not confirmed');
+    }
+
+    const exists = await this.storage.exists(file.key);
+    if (!exists) {
+      throw new NotFoundException('Object not found in storage');
+    }
+
+    return file;
+  }
+
+  linkToEntity(
+    fileId: string,
+    ownerId: string,
+    entityType: string,
+    entityId: string,
+  ) {
+    return this.repository.linkEntity(fileId, ownerId, entityType, entityId);
+  }
+
+  async getPresignedUrl(fileId: string) {
+    const file = await this.repository.findById(fileId);
+    if (!file || file.status !== FileStatus.UPLOADED) return null;
+    return this.storage.getPresignedDownloadUrl(file.key);
+  }
+
+  async getAdminDownloadUrl(fileId: string) {
+    const file = await this.repository.findById(fileId);
+    if (!file) throw new NotFoundException('File not found');
+    if (file.status !== FileStatus.UPLOADED) {
+      throw new BadRequestException('File not available');
+    }
+
+    const url = await this.storage.getPresignedDownloadUrl(file.key);
+    return { url, file };
   }
 }

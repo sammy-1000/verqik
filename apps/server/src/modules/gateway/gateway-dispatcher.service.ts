@@ -5,6 +5,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { AuthUser } from '@verqik/common';
+import { resolveAppError } from '@verqik/common';
+import { AdminCitiesService } from '../admin/admin-cities.service';
+import { AdminVerificationsService } from '../admin/admin-verifications.service';
 import { AuthService } from '../auth/auth.service';
 import { DeliveryService } from '../delivery/delivery.service';
 import { DisputesService } from '../disputes/disputes.service';
@@ -52,6 +55,8 @@ export class GatewayDispatcherService {
     private readonly notificationsService: NotificationsService,
     private readonly referenceService: ReferenceService,
     private readonly journeysQuery: JourneysQueryService,
+    private readonly adminVerificationsService: AdminVerificationsService,
+    private readonly adminCitiesService: AdminCitiesService,
   ) {
     this.registerPublicHandlers();
     this.registerAuthenticatedHandlers();
@@ -116,32 +121,20 @@ export class GatewayDispatcherService {
   }
 
   toRpcFailure(id: string, error: unknown): RpcFailure {
-    if (error instanceof HttpException) {
-      const response = error.getResponse();
-      const message =
-        typeof response === 'string'
-          ? response
-          : ((response as { message?: string | string[] }).message ??
-            error.message);
+    const resolved = resolveAppError(error);
 
-      return {
-        id,
-        ok: false,
-        error: {
-          message: Array.isArray(message) ? message.join(', ') : String(message),
-          status: error.getStatus(),
-        },
-      };
+    if (resolved.status >= 500) {
+      this.logger.error(resolved.errorMessage, error instanceof Error ? error.stack : undefined);
+    } else if (error instanceof HttpException) {
+      this.logger.warn(resolved.errorMessage);
+    } else if (!(error instanceof HttpException)) {
+      this.logger.error(resolved.errorMessage, error instanceof Error ? error.stack : undefined);
     }
 
-    this.logger.error('Unhandled gateway error', error);
     return {
       id,
       ok: false,
-      error: {
-        message: error instanceof Error ? error.message : 'Internal error',
-        status: 500,
-      },
+      error: resolved,
     };
   }
 
@@ -158,6 +151,24 @@ export class GatewayDispatcherService {
 
     this.publicHandlers.set(GatewayEvents.REFERENCE_COUNTRIES, async () =>
       this.referenceService.listCountries(),
+    );
+
+    this.publicHandlers.set(GatewayEvents.REFERENCE_CITIES, async (p) =>
+      this.referenceService.listCities({
+        countryCode: p.countryCode as string | undefined,
+        q: p.q as string | undefined,
+        enabledOnly: true,
+      }),
+    );
+
+    this.publicHandlers.set(GatewayEvents.JOURNEYS_BROWSE, async (p) =>
+      this.journeysService.browse({
+        originCountry: p.originCountry as string | undefined,
+        destinationCountry: p.destinationCountry as string | undefined,
+        originCityId: p.originCityId as string | undefined,
+        destinationCityId: p.destinationCityId as string | undefined,
+        limit: p.limit as number | undefined,
+      }),
     );
 
     this.publicHandlers.set(GatewayEvents.AUTH_REGISTER, async (p) =>
@@ -210,6 +221,19 @@ export class GatewayDispatcherService {
     h.set(GatewayEvents.JOURNEYS_SEARCH, (_u, p) =>
       this.journeysService.search(p as never),
     );
+    h.set(GatewayEvents.JOURNEYS_GET, (u, p) =>
+      this.journeysService.getForBooking(String(p.journeyId), u.id),
+    );
+    h.set(GatewayEvents.JOURNEYS_LIST_MINE, (u) =>
+      this.journeysService.listMine(u.id),
+    );
+    h.set(GatewayEvents.JOURNEYS_UPDATE_TRAVEL, (u, p) => {
+      const { journeyId, ...dto } = p as { journeyId: string } & Record<
+        string,
+        unknown
+      >;
+      return this.journeysService.updateTravel(String(journeyId), u.id, dto as never);
+    });
     h.set(GatewayEvents.JOURNEYS_CANCEL, (u, p) =>
       this.journeysService.cancel(String(p.journeyId), u.id),
     );
@@ -228,12 +252,7 @@ export class GatewayDispatcherService {
       this.deliveryService.getById(String(p.requestId), u.id),
     );
     h.set(GatewayEvents.DELIVERY_REQUESTS_TRANSITION, (u, p) =>
-      this.deliveryService.transition(
-        String(p.requestId),
-        u.id,
-        p.status as never,
-        p.note as string | undefined,
-      ),
+      this.deliveryService.transition(String(p.requestId), u.id, p as never),
     );
 
     // Payments
@@ -287,6 +306,62 @@ export class GatewayDispatcherService {
     );
     h.set(GatewayEvents.NOTIFICATIONS_READ, (u, p) =>
       this.notificationsService.markRead(String(p.notificationId), u.id),
+    );
+    h.set(GatewayEvents.NOTIFICATIONS_UNREAD, (u, p) =>
+      this.notificationsService.markUnread(String(p.notificationId), u.id),
+    );
+    h.set(GatewayEvents.NOTIFICATIONS_READ_ALL, (u) =>
+      this.notificationsService.markAllRead(u.id),
+    );
+    h.set(GatewayEvents.NOTIFICATIONS_UNREAD_COUNT, (u) =>
+      this.notificationsService.unreadCount(u.id),
+    );
+
+    // Verification
+    h.set(GatewayEvents.VERIFICATION_GET, (u) =>
+      this.usersService.getVerification(u.id),
+    );
+    h.set(GatewayEvents.VERIFICATION_SUBMIT, (u, p) =>
+      this.usersService.submitVerification(u.id, p as never),
+    );
+
+    // Admin verification review
+    h.set(GatewayEvents.ADMIN_VERIFICATIONS_LIST, () =>
+      this.adminVerificationsService.listPending(),
+    );
+    h.set(GatewayEvents.ADMIN_VERIFICATIONS_GET, (_u, p) =>
+      this.adminVerificationsService.getDetail(String(p.verificationId)),
+    );
+    h.set(GatewayEvents.ADMIN_VERIFICATIONS_APPROVE, (u, p) =>
+      this.adminVerificationsService.approve(String(p.verificationId), u.id),
+    );
+    h.set(GatewayEvents.ADMIN_VERIFICATIONS_REJECT, (u, p) =>
+      this.adminVerificationsService.reject(
+        String(p.verificationId),
+        u.id,
+        String(p.rejectionReason),
+      ),
+    );
+
+    // Admin cities
+    h.set(GatewayEvents.ADMIN_CITIES_LIST, (_u, p) =>
+      this.adminCitiesService.list({
+        countryCode: p.countryCode as string | undefined,
+        q: p.q as string | undefined,
+      }),
+    );
+    h.set(GatewayEvents.ADMIN_CITIES_GET, (_u, p) =>
+      this.adminCitiesService.getById(String(p.cityId)),
+    );
+    h.set(GatewayEvents.ADMIN_CITIES_CREATE, (u, p) =>
+      this.adminCitiesService.create(p as never, u.id),
+    );
+    h.set(GatewayEvents.ADMIN_CITIES_UPDATE, (u, p) => {
+      const { cityId, ...dto } = p as { cityId: string } & Record<string, unknown>;
+      return this.adminCitiesService.update(String(cityId), dto as never, u.id);
+    });
+    h.set(GatewayEvents.ADMIN_CITIES_DELETE, (u, p) =>
+      this.adminCitiesService.remove(String(p.cityId), u.id),
     );
   }
 }

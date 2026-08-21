@@ -23,6 +23,13 @@ export class FilesRepository {
     return this.prisma.file.findUnique({ where: { id } });
   }
 
+  findDeliveryRequest(id: string) {
+    return this.prisma.deliveryRequest.findUnique({
+      where: { id },
+      select: { senderId: true, travelerId: true },
+    });
+  }
+
   markUploaded(id: string) {
     return this.prisma.file.update({
       where: { id },
@@ -34,6 +41,18 @@ export class FilesRepository {
     return this.prisma.file.update({
       where: { id },
       data: { status: FileStatus.DELETED },
+    });
+  }
+
+  linkEntity(
+    id: string,
+    ownerId: string,
+    entityType: string,
+    entityId: string,
+  ) {
+    return this.prisma.file.updateMany({
+      where: { id, ownerId },
+      data: { entityType, entityId },
     });
   }
 }

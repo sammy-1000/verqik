@@ -5,6 +5,7 @@ import {
 } from "next/font/google";
 
 import "@workspace/ui/globals.css";
+import { AppProviders } from "@/components/providers/app-providers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -41,8 +42,10 @@ export default function RootLayout({
         "font-sans",
       )}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="min-h-svh">
+        <ThemeProvider>
+          <AppProviders>{children}</AppProviders>
+        </ThemeProvider>
       </body>
     </html>
   );

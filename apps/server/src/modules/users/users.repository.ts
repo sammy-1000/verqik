@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, UserProfileType } from '@verqik/database';
+import { Prisma, UserProfileType, VerificationStatus } from '@verqik/database';
 import { PrismaService } from '@verqik/database';
 
 const userSelect = {
@@ -9,6 +9,7 @@ const userSelect = {
   lastName: true,
   profileType: true,
   profilePhotoUrl: true,
+  profilePhotoFileId: true,
   countryCode: true,
   isActive: true,
   ratingAvg: true,
@@ -31,6 +32,22 @@ export class UsersRepository {
     });
   }
 
+  findPublicById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id, isActive: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        profilePhotoUrl: true,
+        profilePhotoFileId: true,
+        ratingAvg: true,
+        ratingCount: true,
+        createdAt: true,
+      },
+    });
+  }
+
   create(data: {
     email: string;
     passwordHash: string;
@@ -49,7 +66,8 @@ export class UsersRepository {
     data: Partial<{
       firstName: string;
       lastName: string;
-      profilePhotoUrl: string;
+      profilePhotoUrl: string | null;
+      profilePhotoFileId: string | null;
       countryCode: string;
     }>,
   ) {
@@ -92,6 +110,39 @@ export class UsersRepository {
     return this.prisma.address.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  getVerification(userId: string) {
+    return this.prisma.userVerification.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  upsertVerification(
+    userId: string,
+    data: {
+      idDocumentType: string;
+      idDocumentUrl: string;
+      selfieUrl: string;
+      status: VerificationStatus;
+      rejectionReason?: string | null;
+      reviewedAt?: Date | null;
+      reviewedById?: string | null;
+    },
+  ) {
+    return this.prisma.userVerification.create({
+      data: {
+        userId,
+        idDocumentType: data.idDocumentType,
+        idDocumentUrl: data.idDocumentUrl,
+        selfieUrl: data.selfieUrl,
+        status: data.status,
+        rejectionReason: data.rejectionReason ?? undefined,
+        reviewedAt: data.reviewedAt ?? undefined,
+        reviewedById: data.reviewedById ?? undefined,
+      },
     });
   }
 

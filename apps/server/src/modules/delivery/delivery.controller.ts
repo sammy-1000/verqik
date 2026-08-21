@@ -54,6 +54,6 @@ export class DeliveryController {
     @Param('id') id: string,
     @Body() dto: TransitionDeliveryDto,
   ) {
-    return this.deliveryService.transition(id, user.id, dto.status, dto.note);
+    return this.deliveryService.transition(id, user.id, dto);
   }
 }

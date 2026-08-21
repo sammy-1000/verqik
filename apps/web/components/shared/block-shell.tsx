@@ -3,11 +3,11 @@ import type { BlockSize, BlockTone, BlockWidth } from "@/lib/blocks/types";
 
 const toneStyles: Record<BlockTone, string> = {
   normal: "bg-background text-foreground",
-  muted: "bg-muted text-foreground",
+  muted: "bg-muted text-foreground [&_.section-description]:text-foreground/75",
   primary:
-    "bg-primary text-primary-foreground [&_.text-muted]:text-primary-foreground/70",
+    "bg-primary text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/70 [&_.section-description]:text-primary-foreground/85",
   secondary:
-    "bg-secondary text-secondary-foreground [&_.text-muted]:text-secondary-foreground/70",
+    "bg-secondary text-secondary-foreground [&_.text-muted-foreground]:text-secondary-foreground/70 [&_.section-description]:text-secondary-foreground/85",
 };
 
 const widthStyles: Record<BlockWidth, string> = {
@@ -119,7 +119,8 @@ export function SectionHeading({
       {description ? (
         <p
           className={cn(
-            "text-muted text-base leading-relaxed text-pretty sm:text-lg",
+            "section-description text-base leading-relaxed text-pretty sm:text-lg",
+            inverted ? "text-primary-foreground/85" : "text-foreground/70",
           )}
         >
           {description}

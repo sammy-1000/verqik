@@ -1,38 +1,30 @@
 import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { config } from 'dotenv';
+import { loadEnvFiles } from './env';
 
-function loadEnvFiles() {
-  const candidates = [
-    path.join(process.cwd(), '.env'),
-    path.join(process.cwd(), '../../apps/server/.env'),
-    path.join(process.cwd(), '../.env'),
-    path.join(process.cwd(), '../../.env'),
-    path.resolve(__dirname, '../../../apps/server/.env'),
-    path.resolve(__dirname, '../.env'),
-    path.resolve(__dirname, '../../.env'),
-  ];
-
-  for (const envPath of candidates) {
-    if (existsSync(envPath)) {
-      config({ path: envPath, override: false });
-    }
-  }
-}
-
-/**
- * Applies pending Prisma migrations (non-interactive).
- * Loads `.env` from the server cwd when run via `pnpm dev` in apps/server.
- */
-export function deployMigrations(): void {
+export function runPrismaCommand(args: string[]) {
   loadEnvFiles();
 
   const packageRoot = path.resolve(__dirname, '..');
 
-  execSync('pnpm exec prisma migrate deploy', {
+  execSync(['pnpm', 'exec', 'prisma', ...args].join(' '), {
     cwd: packageRoot,
     stdio: 'inherit',
     env: process.env,
   });
+}
+
+/** Applies pending Prisma migrations (non-interactive). */
+export function deployMigrations(): void {
+  runPrismaCommand(['migrate', 'deploy']);
+}
+
+/** Creates and applies migrations in development (forwards CLI args). */
+export function devMigrations(): void {
+  runPrismaCommand(['migrate', 'dev', ...process.argv.slice(2)]);
+}
+
+/** Pushes schema changes without migration files. */
+export function pushSchema(): void {
+  runPrismaCommand(['db', 'push', ...process.argv.slice(2)]);
 }

@@ -14,11 +14,12 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
+    "db:generate": "tsx src/generate-cli.ts",
+    "db:push": "tsx src/push-cli.ts",
+    "db:migrate": "tsx src/migrate-dev-cli.ts",
     "db:migrate:deploy": "tsx src/migrate-cli.ts",
-    "db:seed": "tsx prisma/seed.ts",
+    "db:seed": "tsx src/seed-cli.ts",
+    "db:city-images:download": "tsx src/download-city-images-cli.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

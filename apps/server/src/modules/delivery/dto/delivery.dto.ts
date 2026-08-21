@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -62,6 +63,12 @@ export class CreateDeliveryRequestDto {
   @IsOptional()
   @IsString()
   recipientPhone?: string;
+
+  @ApiPropertyOptional({ type: [String], description: 'Package photo file IDs' })
+  @IsOptional()
+  @IsArray()
+  @IsUUID(undefined, { each: true })
+  itemPhotoFileIds?: string[];
 }
 
 export class TransitionDeliveryDto {
@@ -73,4 +80,19 @@ export class TransitionDeliveryDto {
   @IsOptional()
   @IsString()
   note?: string;
+
+  @ApiPropertyOptional({ description: 'Required when status is PICKED_UP' })
+  @IsOptional()
+  @IsUUID()
+  pickupPhotoFileId?: string;
+
+  @ApiPropertyOptional({ description: 'Required when status is DELIVERED' })
+  @IsOptional()
+  @IsUUID()
+  deliveryPhotoFileId?: string;
+
+  @ApiPropertyOptional({ description: 'Meetup location for pickup or delivery' })
+  @IsOptional()
+  @IsString()
+  rendezvousAddress?: string;
 }

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '@verqik/database';
 import { EmailModule } from '@verqik/email';
 import { StorageModule } from '@verqik/storage';
+import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { DisputesModule } from './modules/disputes/disputes.module';
@@ -31,6 +32,7 @@ import { UsersModule } from './modules/users/users.module';
     EmailModule.forRootAsync(),
     RbacModule,
     AuthModule,
+    AdminModule,
     UsersModule,
     FilesModule,
     JourneysModule,

@@ -1,0 +1,93 @@
+{
+  "blocks": [
+    {
+      "id": "how-it-works",
+      "type": "how-it-works",
+      "tone": "muted",
+      "width": "content",
+      "size": "auto",
+      "data": {
+        "eyebrow": "Simple flow",
+        "title": "How crowdshipping works",
+        "description": "Whether you're sending a gift or filling spare luggage weight — three steps to done.",
+        "steps": [
+          {
+            "step": 1,
+            "title": "Find or post a journey",
+            "description": "Travelers list upcoming flights with available kilograms. Senders search by route and date.",
+            "image": { "width": 400, "height": 280, "label": "Journey map", "aspectRatio": "10/7" }
+          },
+          {
+            "step": 2,
+            "title": "Match & lock escrow",
+            "description": "Agree on price, pay into escrow, and chat to arrange pickup before departure.",
+            "image": { "width": 400, "height": 280, "label": "Escrow flow", "aspectRatio": "10/7" }
+          },
+          {
+            "step": 3,
+            "title": "Deliver & get paid",
+            "description": "Traveler carries the item, uploads proof at arrival, and funds release automatically.",
+            "image": { "width": 400, "height": 280, "label": "Delivery handoff", "aspectRatio": "10/7" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "features",
+      "type": "features",
+      "tone": "normal",
+      "width": "content",
+      "size": "auto",
+      "data": {
+        "eyebrow": "Why Verqik",
+        "title": "Built for trust at every mile",
+        "description": "From pickup photo to release of escrow — every step is logged, notified, and dispute-ready.",
+        "items": [
+          {
+            "icon": "shield",
+            "title": "Escrow payments",
+            "description": "Funds are held until the recipient confirms delivery. Travelers get paid, senders stay protected."
+          },
+          {
+            "icon": "badge-check",
+            "title": "Verified identities",
+            "description": "Government ID and selfie checks for travelers. Reputation scores follow every completed trip."
+          },
+          {
+            "icon": "messages",
+            "title": "Real-time chat",
+            "description": "Coordinate pickup windows and customs details in a dedicated thread per delivery."
+          },
+          {
+            "icon": "globe",
+            "title": "Global corridors",
+            "description": "Browse journeys by origin, destination, and available weight — match in minutes."
+          },
+          {
+            "icon": "camera",
+            "title": "Photo proof",
+            "description": "Pickup and drop-off photos timestamped and attached to the delivery timeline."
+          },
+          {
+            "icon": "scale",
+            "title": "Fair disputes",
+            "description": "Structured resolution when something goes wrong, with admin review and audit trail."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "tone": "primary",
+      "width": "content",
+      "size": "auto",
+      "data": {
+        "title": "Ready to try it?",
+        "description": "Browse open journeys or list your next trip — it takes under two minutes.",
+        "primaryCta": { "label": "Create account", "href": "/signup" },
+        "secondaryCta": { "label": "Browse journeys", "href": "/journeys" }
+      }
+    }
+  ]
+}

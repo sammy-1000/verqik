@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, RequirePermissions, type AuthUser } from '@verqik/common';
-import { CreateAddressDto, UpdateProfileDto } from './dto/users.dto';
+import {
+  CreateAddressDto,
+  SubmitVerificationDto,
+  UpdateProfileDto,
+} from './dto/users.dto';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
@@ -35,5 +39,20 @@ export class UsersController {
     @Body() dto: CreateAddressDto,
   ) {
     return this.usersService.createAddress(user.id, dto);
+  }
+
+  @Get('me/verification')
+  @RequirePermissions('users:read')
+  getVerification(@CurrentUser() user: AuthUser) {
+    return this.usersService.getVerification(user.id);
+  }
+
+  @Post('me/verification')
+  @RequirePermissions('users:write')
+  submitVerification(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: SubmitVerificationDto,
+  ) {
+    return this.usersService.submitVerification(user.id, dto);
   }
 }

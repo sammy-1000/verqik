@@ -1,8 +1,27 @@
 import Link from "next/link";
-import type { HeroBlock } from "@/lib/blocks/types";
+import type { HeroBlock, PlaceholderImageConfig } from "@/lib/blocks/types";
 import { BlockShell } from "@/components/shared/block-shell";
 import { PlaceholderImage } from "@/components/shared/placeholder-image";
 import { Button } from "@workspace/ui/components/button";
+
+function HeroImage({ image }: { image: PlaceholderImageConfig }) {
+  if (image.src) {
+    return (
+      <div className="flex items-end justify-center lg:justify-end">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image.src}
+          alt={image.alt ?? image.label ?? "Hero illustration"}
+          width={image.width}
+          height={image.height}
+          className="h-auto w-full max-w-md object-contain object-bottom sm:max-w-lg lg:max-w-xl"
+        />
+      </div>
+    );
+  }
+
+  return <PlaceholderImage {...image} className="shadow-sm ring-1 ring-border/60" />;
+}
 
 export function HeroBlockView({ id, tone, width, size, data }: HeroBlock) {
   return (
@@ -51,7 +70,7 @@ export function HeroBlockView({ id, tone, width, size, data }: HeroBlock) {
           </div>
         </div>
 
-        <PlaceholderImage {...data.image} className="shadow-sm ring-1 ring-border/60" />
+        <HeroImage image={data.image} />
       </div>
     </BlockShell>
   );

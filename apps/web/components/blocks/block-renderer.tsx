@@ -7,6 +7,8 @@ import { HowItWorksBlockView } from "./how-it-works-block";
 import { RoutesBlockView } from "./routes-block";
 import { TestimonialsBlockView } from "./testimonials-block";
 import { CtaBlockView } from "./cta-block";
+import { CitiesPreviewBlockView } from "./cities-preview-block";
+import { JourneysPreviewBlockView } from "./journeys-preview-block";
 
 export function BlockRenderer({ block }: { block: LandingBlock }) {
   switch (block.type) {
@@ -26,6 +28,10 @@ export function BlockRenderer({ block }: { block: LandingBlock }) {
       return <TestimonialsBlockView {...block} />;
     case "cta":
       return <CtaBlockView {...block} />;
+    case "cities-preview":
+      return <CitiesPreviewBlockView {...block} />;
+    case "journeys-preview":
+      return <JourneysPreviewBlockView {...block} />;
     default:
       return null;
   }

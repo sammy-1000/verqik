@@ -108,11 +108,30 @@ export interface LogoCloudBlockData {
   logos: { name: string }[];
 }
 
+export interface CitiesPreviewBlockData {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  limit?: number;
+  browseMore: LinkItem;
+}
+
+export interface JourneysPreviewBlockData {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  limit?: number;
+  browseMore: LinkItem;
+}
+
 export interface PlaceholderImageConfig {
   width: number;
   height: number;
   label?: string;
   aspectRatio?: string;
+  /** When set, renders a real image instead of the SVG placeholder */
+  src?: string;
+  alt?: string;
 }
 
 export type HeroBlock = BlockBase & { type: "hero"; data: HeroBlockData };
@@ -135,6 +154,14 @@ export type LogoCloudBlock = BlockBase & {
   type: "logo-cloud";
   data: LogoCloudBlockData;
 };
+export type CitiesPreviewBlock = BlockBase & {
+  type: "cities-preview";
+  data: CitiesPreviewBlockData;
+};
+export type JourneysPreviewBlock = BlockBase & {
+  type: "journeys-preview";
+  data: JourneysPreviewBlockData;
+};
 
 export type LandingBlock =
   | HeroBlock
@@ -144,7 +171,9 @@ export type LandingBlock =
   | TestimonialsBlock
   | RoutesBlock
   | CtaBlock
-  | LogoCloudBlock;
+  | LogoCloudBlock
+  | CitiesPreviewBlock
+  | JourneysPreviewBlock;
 
 export interface LandingPageContent {
   meta: {

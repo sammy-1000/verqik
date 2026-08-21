@@ -23,7 +23,9 @@
     "db:push": "pnpm --filter @verqik/database db:push",
     "db:migrate": "pnpm --filter @verqik/database db:migrate",
     "db:migrate:deploy": "pnpm --filter @verqik/database db:migrate:deploy",
-    "db:seed": "pnpm --filter @verqik/database db:seed"
+    "db:seed": "pnpm --filter @verqik/database db:seed",
+    "admin:create": "tsx src/cli/create-admin-cli.ts",
+    "seed:demo": "nest build && node dist/cli/seed-demo-cli.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -60,6 +62,7 @@
     "@types/node": "^22.10.7",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
+    "@inquirer/prompts": "^7.3.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -71,6 +74,7 @@
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"

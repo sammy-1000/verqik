@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AdminModule } from '../admin/admin.module';
 import { AuthModule } from '../auth/auth.module';
 import { DeliveryModule } from '../delivery/delivery.module';
 import { DisputesModule } from '../disputes/disputes.module';
@@ -28,6 +29,7 @@ import { WsAuthService } from './ws-auth.service';
       }),
     }),
     AuthModule,
+    AdminModule,
     UsersModule,
     RbacModule,
     FilesModule,

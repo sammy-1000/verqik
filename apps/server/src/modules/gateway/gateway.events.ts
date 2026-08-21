@@ -15,6 +15,8 @@ export const GatewayEvents = {
   // Health / reference (public)
   HEALTH_CHECK: 'health:check',
   REFERENCE_COUNTRIES: 'reference:countries',
+  REFERENCE_CITIES: 'reference:cities',
+  JOURNEYS_BROWSE: 'journeys:browse',
 
   // Users
   USERS_ME_GET: 'users:me:get',
@@ -34,6 +36,9 @@ export const GatewayEvents = {
   // Journeys
   JOURNEYS_CREATE: 'journeys:create',
   JOURNEYS_SEARCH: 'journeys:search',
+  JOURNEYS_GET: 'journeys:get',
+  JOURNEYS_LIST_MINE: 'journeys:list-mine',
+  JOURNEYS_UPDATE_TRAVEL: 'journeys:travel:update',
   JOURNEYS_CANCEL: 'journeys:cancel',
 
   // Delivery
@@ -65,6 +70,26 @@ export const GatewayEvents = {
   // Notifications
   NOTIFICATIONS_LIST: 'notifications:list',
   NOTIFICATIONS_READ: 'notifications:read',
+  NOTIFICATIONS_UNREAD: 'notifications:unread',
+  NOTIFICATIONS_READ_ALL: 'notifications:read-all',
+  NOTIFICATIONS_UNREAD_COUNT: 'notifications:unread-count',
+
+  // Verification
+  VERIFICATION_GET: 'verification:get',
+  VERIFICATION_SUBMIT: 'verification:submit',
+
+  // Admin verification review
+  ADMIN_VERIFICATIONS_LIST: 'admin:verifications:list',
+  ADMIN_VERIFICATIONS_GET: 'admin:verifications:get',
+  ADMIN_VERIFICATIONS_APPROVE: 'admin:verifications:approve',
+  ADMIN_VERIFICATIONS_REJECT: 'admin:verifications:reject',
+
+  // Admin cities
+  ADMIN_CITIES_LIST: 'admin:cities:list',
+  ADMIN_CITIES_GET: 'admin:cities:get',
+  ADMIN_CITIES_CREATE: 'admin:cities:create',
+  ADMIN_CITIES_UPDATE: 'admin:cities:update',
+  ADMIN_CITIES_DELETE: 'admin:cities:delete',
 } as const;
 
 export type GatewayEvent =
@@ -83,6 +108,7 @@ export const PushEvents = {
   PAYMENT_UPDATED: 'payment:updated',
   JOURNEY_UPDATED: 'journey:updated',
   USER_UPDATED: 'user:updated',
+  VERIFICATION_UPDATED: 'verification:updated',
 } as const;
 
 /** Events that do not require authentication */
@@ -92,6 +118,8 @@ export const PUBLIC_EVENTS = new Set<string>([
   GatewayEvents.AUTH_LOGIN,
   GatewayEvents.HEALTH_CHECK,
   GatewayEvents.REFERENCE_COUNTRIES,
+  GatewayEvents.REFERENCE_CITIES,
+  GatewayEvents.JOURNEYS_BROWSE,
 ]);
 
 /** Required RBAC permission per event */
@@ -107,6 +135,9 @@ export const EVENT_PERMISSIONS: Partial<Record<string, string[]>> = {
   [GatewayEvents.FILES_DELETE]: ['files:write'],
   [GatewayEvents.JOURNEYS_CREATE]: ['journeys:write'],
   [GatewayEvents.JOURNEYS_SEARCH]: ['journeys:read'],
+  [GatewayEvents.JOURNEYS_GET]: ['journeys:read'],
+  [GatewayEvents.JOURNEYS_LIST_MINE]: ['journeys:read'],
+  [GatewayEvents.JOURNEYS_UPDATE_TRAVEL]: ['journeys:write'],
   [GatewayEvents.JOURNEYS_CANCEL]: ['journeys:write'],
   [GatewayEvents.DELIVERY_CATEGORIES]: ['delivery:read'],
   [GatewayEvents.DELIVERY_REQUESTS_CREATE]: ['delivery:write'],
@@ -126,5 +157,19 @@ export const EVENT_PERMISSIONS: Partial<Record<string, string[]>> = {
   [GatewayEvents.DISPUTES_RESOLVE]: ['disputes:manage'],
   [GatewayEvents.NOTIFICATIONS_LIST]: ['notifications:read'],
   [GatewayEvents.NOTIFICATIONS_READ]: ['notifications:write'],
+  [GatewayEvents.NOTIFICATIONS_UNREAD]: ['notifications:write'],
+  [GatewayEvents.NOTIFICATIONS_READ_ALL]: ['notifications:write'],
+  [GatewayEvents.NOTIFICATIONS_UNREAD_COUNT]: ['notifications:read'],
+  [GatewayEvents.VERIFICATION_GET]: ['users:read'],
+  [GatewayEvents.VERIFICATION_SUBMIT]: ['users:write'],
+  [GatewayEvents.ADMIN_VERIFICATIONS_LIST]: ['verification:read'],
+  [GatewayEvents.ADMIN_VERIFICATIONS_GET]: ['verification:read'],
+  [GatewayEvents.ADMIN_VERIFICATIONS_APPROVE]: ['verification:review'],
+  [GatewayEvents.ADMIN_VERIFICATIONS_REJECT]: ['verification:review'],
+  [GatewayEvents.ADMIN_CITIES_LIST]: ['cities:manage'],
+  [GatewayEvents.ADMIN_CITIES_GET]: ['cities:manage'],
+  [GatewayEvents.ADMIN_CITIES_CREATE]: ['cities:manage'],
+  [GatewayEvents.ADMIN_CITIES_UPDATE]: ['cities:manage'],
+  [GatewayEvents.ADMIN_CITIES_DELETE]: ['cities:manage'],
   [GatewayEvents.ROOM_JOIN]: ['delivery:read'],
 };

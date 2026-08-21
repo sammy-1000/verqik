@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { NotificationChannel, PrismaService } from '@verqik/database';
 import { EmailService } from '@verqik/email';
 import { PushEvents } from '../gateway/gateway.events';
 import { GatewayPushService } from '../realtime/gateway-push.service';
+import {
+  NotificationEvent,
+  NotificationProcessPayload,
+  resolveNotificationTemplate,
+} from './notification.events';
 
 @Injectable()
 export class NotificationsRepository {
@@ -11,6 +16,7 @@ export class NotificationsRepository {
   create(data: {
     userId: string;
     channel: NotificationChannel;
+    eventType: string;
     title: string;
     body?: string;
     relatedId?: string;
@@ -34,6 +40,26 @@ export class NotificationsRepository {
       data: { isRead: true },
     });
   }
+
+  markUnread(id: string, userId: string) {
+    return this.prisma.notification.updateMany({
+      where: { id, userId },
+      data: { isRead: false },
+    });
+  }
+
+  markAllRead(userId: string) {
+    return this.prisma.notification.updateMany({
+      where: { userId, isRead: false },
+      data: { isRead: true },
+    });
+  }
+
+  countUnread(userId: string) {
+    return this.prisma.notification.count({
+      where: { userId, isRead: false },
+    });
+  }
 }
 
 @Injectable()
@@ -48,10 +74,63 @@ export class NotificationsService {
     return this.repository.listForUser(userId, unreadOnly);
   }
 
-  markRead(id: string, userId: string) {
-    return this.repository.markRead(id, userId);
+  unreadCount(userId: string) {
+    return this.repository.countUnread(userId);
   }
 
+  async markRead(id: string, userId: string) {
+    const result = await this.repository.markRead(id, userId);
+    if (result.count === 0) {
+      throw new NotFoundException('Notification not found');
+    }
+    return { ok: true };
+  }
+
+  async markUnread(id: string, userId: string) {
+    const result = await this.repository.markUnread(id, userId);
+    if (result.count === 0) {
+      throw new NotFoundException('Notification not found');
+    }
+    return { ok: true };
+  }
+
+  markAllRead(userId: string) {
+    return this.repository.markAllRead(userId);
+  }
+
+  /** Single entry point for all domain notification events */
+  async process(event: NotificationEvent, payload: NotificationProcessPayload) {
+    const template = resolveNotificationTemplate(event, payload.meta);
+
+    const notification = await this.repository.create({
+      userId: payload.userId,
+      channel: template.channel,
+      eventType: event,
+      title: template.title,
+      body: template.body,
+      relatedId: payload.relatedId,
+    });
+
+    if (template.channel === NotificationChannel.EMAIL && payload.email) {
+      void this.emailService
+        .send({
+          to: payload.email,
+          subject: template.title,
+          text: template.body,
+        })
+        .catch(() => undefined);
+    }
+
+    if (this.push.isReady()) {
+      this.push.toUser(payload.userId, PushEvents.NOTIFICATION_NEW, {
+        notification,
+      });
+    }
+
+    return notification;
+  }
+
+  /** @deprecated Use process() instead */
   async notify(data: {
     userId: string;
     channel: NotificationChannel;
@@ -60,7 +139,14 @@ export class NotificationsService {
     relatedId?: string;
     email?: string;
   }) {
-    const notification = await this.repository.create(data);
+    const notification = await this.repository.create({
+      userId: data.userId,
+      channel: data.channel,
+      eventType: 'legacy.manual',
+      title: data.title,
+      body: data.body,
+      relatedId: data.relatedId,
+    });
 
     if (data.channel === NotificationChannel.EMAIL && data.email) {
       void this.emailService

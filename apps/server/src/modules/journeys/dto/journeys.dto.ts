@@ -3,6 +3,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
   Min,
 } from 'class-validator';
@@ -11,22 +12,12 @@ import { Type } from 'class-transformer';
 
 export class CreateJourneyDto {
   @ApiProperty()
-  @IsString()
-  @Length(2, 2)
-  originCountry: string;
+  @IsUUID()
+  originCityId: string;
 
   @ApiProperty()
-  @IsString()
-  originCity: string;
-
-  @ApiProperty()
-  @IsString()
-  @Length(2, 2)
-  destinationCountry: string;
-
-  @ApiProperty()
-  @IsString()
-  destinationCity: string;
+  @IsUUID()
+  destinationCityId: string;
 
   @ApiProperty()
   @IsDateString()
@@ -77,6 +68,16 @@ export class SearchJourneysDto {
   @IsString()
   @Length(2, 2)
   destinationCountry?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  originCityId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  destinationCityId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

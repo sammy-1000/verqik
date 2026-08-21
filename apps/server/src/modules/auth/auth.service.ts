@@ -1,10 +1,13 @@
 import {
   ConflictException,
+  HttpStatus,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserProfileType } from '@verqik/database';
+import { AppException } from '@verqik/common';
 import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';
 import { EmailService } from '@verqik/email';
@@ -15,10 +18,10 @@ import { LoginDto, RegisterDto } from './dto/auth.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly rbacService: RbacService,
-    private readonly jwtService: JwtService,
-    private readonly emailService: EmailService,
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(RbacService) private readonly rbacService: RbacService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
+    @Inject(EmailService) private readonly emailService: EmailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -38,15 +41,16 @@ export class AuthService {
       profileType,
     });
 
-    const roleName =
-      profileType === UserProfileType.TRAVELER
-        ? 'traveler'
-        : profileType === UserProfileType.BOTH
-          ? 'sender'
-          : 'sender';
-
-    await this.rbacService.assignRole(user.id, roleName);
-    if (profileType === UserProfileType.BOTH) {
+    if (
+      profileType === UserProfileType.SENDER ||
+      profileType === UserProfileType.BOTH
+    ) {
+      await this.rbacService.assignRole(user.id, 'sender');
+    }
+    if (
+      profileType === UserProfileType.TRAVELER ||
+      profileType === UserProfileType.BOTH
+    ) {
       await this.rbacService.assignRole(user.id, 'traveler');
     }
 
@@ -78,16 +82,25 @@ export class AuthService {
   }
 
   private async issueTokens(userId: string, email: string) {
-    const accessToken = await this.jwtService.signAsync({ sub: userId, email });
-    const refreshToken = randomBytes(48).toString('hex');
-    const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+    try {
+      const accessToken = await this.jwtService.signAsync({ sub: userId, email });
+      const refreshToken = randomBytes(48).toString('hex');
+      const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
 
-    await this.usersRepository.storeRefreshToken(
-      userId,
-      tokenHash,
-      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    );
+      await this.usersRepository.storeRefreshToken(
+        userId,
+        tokenHash,
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      );
 
-    return { accessToken, refreshToken };
+      return { accessToken, refreshToken };
+    } catch (error) {
+      throw new AppException({
+        userMessage: 'Unable to sign in right now. Please try again.',
+        errorMessage:
+          error instanceof Error ? error.message : 'JWT token issuance failed',
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 }

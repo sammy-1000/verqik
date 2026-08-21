@@ -54,7 +54,7 @@ export function SiteFooter({
             ))}
           </div>
           <p className="text-muted-foreground text-xs">
-            Placeholder landing — content driven by JSON blocks
+            Crowdshipping powered by real journeys
           </p>
         </div>
       </div>

@@ -14,7 +14,10 @@
     "db:push": "pnpm --filter @verqik/database db:push",
     "db:migrate": "pnpm --filter @verqik/database db:migrate",
     "db:migrate:deploy": "pnpm --filter @verqik/database db:migrate:deploy",
-    "db:seed": "pnpm --filter @verqik/database db:seed"
+    "db:seed": "pnpm --filter @verqik/database db:seed",
+    "db:city-images:download": "pnpm --filter @verqik/database db:city-images:download",
+    "admin:create": "pnpm --filter server admin:create",
+    "seed:demo": "pnpm --filter server seed:demo"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

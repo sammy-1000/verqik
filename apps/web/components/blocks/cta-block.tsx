@@ -1,7 +1,18 @@
 import Link from "next/link";
-import type { CtaBlock } from "@/lib/blocks/types";
+import type { CtaBlock, BlockTone } from "@/lib/blocks/types";
 import { BlockShell } from "@/components/shared/block-shell";
 import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
+
+function invertedOutlineClass(tone?: BlockTone) {
+  if (tone === "primary") {
+    return "border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground";
+  }
+  if (tone === "secondary") {
+    return "border-secondary-foreground/40 bg-transparent text-secondary-foreground hover:bg-secondary-foreground/10 hover:text-secondary-foreground";
+  }
+  return undefined;
+}
 
 export function CtaBlockView({ id, tone, width, size, data }: CtaBlock) {
   return (
@@ -28,6 +39,7 @@ export function CtaBlockView({ id, tone, width, size, data }: CtaBlock) {
               render={<Link href={data.secondaryCta.href} />}
               variant="outline"
               size="lg"
+              className={cn(invertedOutlineClass(tone))}
             >
               {data.secondaryCta.label}
             </Button>

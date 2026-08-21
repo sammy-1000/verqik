@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { isValidJwtExpiresIn, parseJwtExpiresIn } from '@verqik/common';
 import { RbacModule } from '../rbac/rbac.module';
 import { PermissionsGuard } from '../rbac/permissions.guard';
 import { UsersModule } from '../users/users.module';
@@ -19,12 +20,24 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', 'change-me'),
-        signOptions: {
-          expiresIn: config.get('JWT_EXPIRES_IN', '7d') as `${number}d`,
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const configured = config.get<string>('JWT_EXPIRES_IN');
+        const expiresIn = parseJwtExpiresIn(configured);
+
+        if (configured && !isValidJwtExpiresIn(configured)) {
+          Logger.warn(
+            `Invalid JWT_EXPIRES_IN "${configured}" — using "${expiresIn}"`,
+            'JwtModule',
+          );
+        }
+
+        return {
+          secret: config.get<string>('JWT_SECRET', 'change-me'),
+          signOptions: {
+            expiresIn: expiresIn as `${number}d`,
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthController],

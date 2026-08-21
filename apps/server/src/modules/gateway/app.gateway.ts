@@ -51,30 +51,33 @@ export class AppGateway
 
   afterInit(server: Server) {
     this.push.setServer(server);
+
+    server.use(async (socket: AuthenticatedSocket, next) => {
+      try {
+        const token = this.wsAuth.extractToken({
+          token: socket.handshake.auth?.token as string | undefined,
+          authorization: socket.handshake.headers.authorization as
+            | string
+            | undefined,
+        });
+
+        if (token) {
+          const user = await this.wsAuth.authenticate(token);
+          socket.data.user = { ...user, socketId: socket.id };
+        }
+
+        next();
+      } catch {
+        next(new Error('Unauthorized'));
+      }
+    });
+
     this.logger.log('Socket.IO gateway ready — use event "rpc" or direct event names');
   }
 
   async handleConnection(client: AuthenticatedSocket) {
-    const token = this.wsAuth.extractToken({
-      token: client.handshake.auth?.token as string | undefined,
-      authorization: client.handshake.headers.authorization,
-    });
-
-    if (token) {
-      try {
-        const user = await this.wsAuth.authenticate(token);
-        client.data.user = { ...user, socketId: client.id };
-        await client.join(`user:${user.id}`);
-      } catch (error) {
-        this.logger.warn(`WS auth failed for ${client.id}`);
-        client.emit(PushEvents.RPC_ERROR, {
-          id: 'connection',
-          ok: false,
-          error: { message: 'Authentication failed', status: 401 },
-        });
-        client.disconnect(true);
-        return;
-      }
+    if (client.data.user) {
+      await client.join(`user:${client.data.user.id}`);
     }
 
     client.emit(PushEvents.CONNECTED, {

@@ -1,0 +1,82 @@
+{
+  "blocks": [
+    {
+      "id": "logo-cloud",
+      "type": "logo-cloud",
+      "tone": "muted",
+      "width": "content",
+      "size": "compact",
+      "data": {
+        "title": "Trusted by senders and travelers across",
+        "logos": [
+          { "name": "Kigali" },
+          { "name": "Nairobi" },
+          { "name": "Lagos" },
+          { "name": "London" },
+          { "name": "Dubai" },
+          { "name": "New York" }
+        ]
+      }
+    },
+    {
+      "id": "stats",
+      "type": "stats",
+      "tone": "primary",
+      "width": "content",
+      "size": "auto",
+      "data": {
+        "title": "Growing every week",
+        "items": [
+          { "value": "12k+", "label": "Deliveries matched", "detail": "Last 90 days" },
+          { "value": "84", "label": "Countries connected", "detail": "Active routes" },
+          { "value": "4.9", "label": "Average rating", "detail": "From 3,200 reviews" },
+          { "value": "< 48h", "label": "Median match time", "detail": "Popular corridors" }
+        ]
+      }
+    },
+    {
+      "id": "testimonials",
+      "type": "testimonials",
+      "tone": "secondary",
+      "width": "content",
+      "size": "auto",
+      "data": {
+        "eyebrow": "Community",
+        "title": "Stories from the corridor",
+        "items": [
+          {
+            "quote": "Sent wedding attire from Kigali to London in 3 days. Cheaper than DHL and I could chat with the traveler the whole way.",
+            "name": "Amara N.",
+            "role": "Sender · KGL → LHR",
+            "avatar": { "width": 48, "height": 48, "label": "AN", "aspectRatio": "1/1" }
+          },
+          {
+            "quote": "I fly Nairobi–Dubai monthly. Verqik pays for my extra baggage slot — verified senders, smooth handoffs at the airport.",
+            "name": "James O.",
+            "role": "Traveler · NBO → DXB",
+            "avatar": { "width": 48, "height": 48, "label": "JO", "aspectRatio": "1/1" }
+          },
+          {
+            "quote": "Escrow meant zero stress shipping samples to our NYC office. Dispute tools exist but we've never needed them.",
+            "name": "Lena K.",
+            "role": "Small business sender",
+            "avatar": { "width": 48, "height": 48, "label": "LK", "aspectRatio": "1/1" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "tone": "primary",
+      "width": "content",
+      "size": "auto",
+      "data": {
+        "title": "Join the community",
+        "description": "Create a free account to send packages, list journeys, and build your reputation.",
+        "primaryCta": { "label": "Get started", "href": "/signup" },
+        "secondaryCta": { "label": "Sign in", "href": "/login" }
+      }
+    }
+  ]
+}

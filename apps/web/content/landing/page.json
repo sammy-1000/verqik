@@ -7,12 +7,12 @@
     "brand": "Verqik",
     "tagline": "Crowdshipping",
     "nav": [
-      { "label": "How it works", "href": "#how-it-works" },
-      { "label": "Routes", "href": "#routes" },
-      { "label": "Safety", "href": "#features" },
-      { "label": "Reviews", "href": "#testimonials" }
+      { "label": "Cities", "href": "/cities" },
+      { "label": "Journeys", "href": "/journeys" },
+      { "label": "How it works", "href": "/how-it-works" },
+      { "label": "Community", "href": "/community" }
     ],
-    "cta": { "label": "Get started", "href": "#cta" }
+    "cta": { "label": "Get started", "href": "/signup" }
   },
   "footer": {
     "brand": "Verqik",
@@ -21,18 +21,17 @@
       {
         "title": "Product",
         "links": [
-          { "label": "For senders", "href": "#" },
-          { "label": "For travelers", "href": "#" },
-          { "label": "Pricing", "href": "#" },
-          { "label": "Insurance", "href": "#" }
+          { "label": "Browse journeys", "href": "/journeys" },
+          { "label": "Supported cities", "href": "/cities" },
+          { "label": "How it works", "href": "/how-it-works" },
+          { "label": "Sign up", "href": "/signup" }
         ]
       },
       {
         "title": "Company",
         "links": [
+          { "label": "Community", "href": "/community" },
           { "label": "About", "href": "#" },
-          { "label": "Careers", "href": "#" },
-          { "label": "Press", "href": "#" },
           { "label": "Contact", "href": "#" }
         ]
       },
@@ -47,7 +46,7 @@
     ],
     "legal": [
       { "label": "© 2026 Verqik", "href": "#" },
-      { "label": "Status", "href": "#" }
+      { "label": "Log in", "href": "/login" }
     ]
   },
   "blocks": [
@@ -60,48 +59,44 @@
         "eyebrow": "Crowdshipping platform",
         "title": "Send packages on journeys already heading your way",
         "description": "Match with verified travelers flying your route. Funds stay in escrow until delivery is confirmed — faster than freight, smarter than couriers.",
-        "primaryCta": { "label": "Post a delivery", "href": "#cta" },
-        "secondaryCta": { "label": "List a journey", "href": "#routes" },
+        "primaryCta": { "label": "Get started", "href": "/signup" },
+        "secondaryCta": { "label": "Browse journeys", "href": "/journeys" },
         "badges": ["Escrow protected", "ID verified", "Live tracking"],
         "image": {
           "width": 640,
-          "height": 480,
-          "label": "Traveler with package",
-          "aspectRatio": "4/3"
+          "height": 960,
+          "label": "Traveler with suitcase",
+          "src": "/images/hero-image.png",
+          "alt": "Traveler with a red suitcase checking their phone"
         }
       }
     },
     {
-      "id": "logo-cloud",
-      "type": "logo-cloud",
+      "id": "cities-preview",
+      "type": "cities-preview",
       "tone": "muted",
       "width": "content",
-      "size": "compact",
+      "size": "auto",
       "data": {
-        "title": "Trusted by senders and travelers across",
-        "logos": [
-          { "name": "Kigali" },
-          { "name": "Nairobi" },
-          { "name": "Lagos" },
-          { "name": "London" },
-          { "name": "Dubai" },
-          { "name": "New York" }
-        ]
+        "eyebrow": "Global network",
+        "title": "Supported cities",
+        "description": "Real corridors across Africa, Europe, and beyond — with local airport codes and city photos.",
+        "limit": 10,
+        "browseMore": { "label": "Browse all cities", "href": "/cities" }
       }
     },
     {
-      "id": "stats",
-      "type": "stats",
-      "tone": "primary",
+      "id": "journeys-preview",
+      "type": "journeys-preview",
+      "tone": "normal",
       "width": "content",
+      "size": "auto",
       "data": {
-        "title": "Growing every week",
-        "items": [
-          { "value": "12k+", "label": "Deliveries matched", "detail": "Last 90 days" },
-          { "value": "84", "label": "Countries connected", "detail": "Active routes" },
-          { "value": "4.9", "label": "Average rating", "detail": "From 3,200 reviews" },
-          { "value": "< 48h", "label": "Median match time", "detail": "Popular corridors" }
-        ]
+        "eyebrow": "Live listings",
+        "title": "Upcoming journeys",
+        "description": "Travelers with spare luggage weight on routes you care about. Sign in to book a delivery.",
+        "limit": 6,
+        "browseMore": { "label": "Browse all journeys", "href": "/journeys" }
       }
     },
     {
@@ -109,6 +104,7 @@
       "type": "features",
       "tone": "normal",
       "width": "content",
+      "size": "auto",
       "data": {
         "eyebrow": "Why Verqik",
         "title": "Built for trust at every mile",
@@ -125,122 +121,9 @@
             "description": "Government ID and selfie checks for travelers. Reputation scores follow every completed trip."
           },
           {
-            "icon": "messages",
-            "title": "Real-time chat",
-            "description": "Coordinate pickup windows and customs details in a dedicated thread per delivery."
-          },
-          {
             "icon": "globe",
             "title": "Global corridors",
             "description": "Browse journeys by origin, destination, and available weight — match in minutes."
-          },
-          {
-            "icon": "camera",
-            "title": "Photo proof",
-            "description": "Pickup and drop-off photos timestamped and attached to the delivery timeline."
-          },
-          {
-            "icon": "scale",
-            "title": "Fair disputes",
-            "description": "Structured resolution when something goes wrong, with admin review and audit trail."
-          }
-        ]
-      }
-    },
-    {
-      "id": "how-it-works",
-      "type": "how-it-works",
-      "tone": "muted",
-      "width": "content",
-      "data": {
-        "eyebrow": "Simple flow",
-        "title": "How crowdshipping works",
-        "description": "Whether you're sending a gift or filling spare luggage weight — three steps to done.",
-        "steps": [
-          {
-            "step": 1,
-            "title": "Find or post a journey",
-            "description": "Travelers list upcoming flights with available kilograms. Senders search by route and date.",
-            "image": { "width": 400, "height": 280, "label": "Journey map", "aspectRatio": "10/7" }
-          },
-          {
-            "step": 2,
-            "title": "Match & lock escrow",
-            "description": "Agree on price, pay into escrow, and chat to arrange pickup before departure.",
-            "image": { "width": 400, "height": 280, "label": "Escrow flow", "aspectRatio": "10/7" }
-          },
-          {
-            "step": 3,
-            "title": "Deliver & get paid",
-            "description": "Traveler carries the item, uploads proof at arrival, and funds release automatically.",
-            "image": { "width": 400, "height": 280, "label": "Delivery handoff", "aspectRatio": "10/7" }
-          }
-        ]
-      }
-    },
-    {
-      "id": "routes",
-      "type": "routes",
-      "tone": "normal",
-      "width": "content",
-      "data": {
-        "eyebrow": "Live journeys",
-        "title": "Popular routes this week",
-        "description": "Placeholder listings — real data will come from the journeys module.",
-        "items": [
-          {
-            "from": "KGL",
-            "to": "LHR",
-            "date": "Aug 24, 2026",
-            "price": "$12/kg",
-            "weight": "8 kg free",
-            "image": { "width": 320, "height": 200, "label": "KGL → LHR", "aspectRatio": "16/10" }
-          },
-          {
-            "from": "NBO",
-            "to": "DXB",
-            "date": "Aug 26, 2026",
-            "price": "$9/kg",
-            "weight": "5 kg free",
-            "image": { "width": 320, "height": 200, "label": "NBO → DXB", "aspectRatio": "16/10" }
-          },
-          {
-            "from": "LOS",
-            "to": "JFK",
-            "date": "Aug 29, 2026",
-            "price": "$15/kg",
-            "weight": "12 kg free",
-            "image": { "width": 320, "height": 200, "label": "LOS → JFK", "aspectRatio": "16/10" }
-          }
-        ]
-      }
-    },
-    {
-      "id": "testimonials",
-      "type": "testimonials",
-      "tone": "secondary",
-      "width": "content",
-      "data": {
-        "eyebrow": "Community",
-        "title": "Stories from the corridor",
-        "items": [
-          {
-            "quote": "Sent wedding attire from Kigali to London in 3 days. Cheaper than DHL and I could chat with the traveler the whole way.",
-            "name": "Amara N.",
-            "role": "Sender · KGL → LHR",
-            "avatar": { "width": 48, "height": 48, "label": "AN", "aspectRatio": "1/1" }
-          },
-          {
-            "quote": "I fly Nairobi–Dubai monthly. Verqik pays for my extra baggage slot — verified senders, smooth handoffs at the airport.",
-            "name": "James O.",
-            "role": "Traveler · NBO → DXB",
-            "avatar": { "width": 48, "height": 48, "label": "JO", "aspectRatio": "1/1" }
-          },
-          {
-            "quote": "Escrow meant zero stress shipping samples to our NYC office. Dispute tools exist but we've never needed them.",
-            "name": "Lena K.",
-            "role": "Small business sender",
-            "avatar": { "width": 48, "height": 48, "label": "LK", "aspectRatio": "1/1" }
           }
         ]
       }
@@ -250,11 +133,12 @@
       "type": "cta",
       "tone": "primary",
       "width": "content",
+      "size": "auto",
       "data": {
         "title": "Ready to ship on someone's spare weight?",
         "description": "Create a free account, browse open journeys, or list your next trip in under two minutes.",
-        "primaryCta": { "label": "Create account", "href": "#" },
-        "secondaryCta": { "label": "Browse journeys", "href": "#routes" }
+        "primaryCta": { "label": "Create account", "href": "/signup" },
+        "secondaryCta": { "label": "Sign in", "href": "/login" }
       }
     }
   ]

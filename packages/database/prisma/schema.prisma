@@ -29,6 +29,14 @@ enum JourneyStatus {
   CANCELLED
 }
 
+enum TravelPhase {
+  SCHEDULED
+  DEPARTED
+  EN_ROUTE
+  LANDED
+  AT_RENDEZVOUS
+}
+
 enum RequestStatus {
   PENDING
   ACCEPTED
@@ -74,6 +82,11 @@ enum FileStatus {
   PENDING
   UPLOADED
   DELETED
+}
+
+enum CitySource {
+  SEED
+  MANUAL
 }
 
 // ─── RBAC (auth module) ──────────────────────────────────────────────────────
@@ -135,6 +148,7 @@ model User {
   lastName      String          @map("last_name")
   profileType   UserProfileType @default(SENDER) @map("profile_type")
   profilePhotoUrl String?       @map("profile_photo_url")
+  profilePhotoFileId String?    @unique @map("profile_photo_file_id") @db.Uuid
   countryCode   String?         @map("country_code") @db.Char(2)
   dateOfBirth   DateTime?       @map("date_of_birth") @db.Date
   isActive      Boolean         @default(true) @map("is_active")
@@ -161,6 +175,7 @@ model User {
   disputesResolved   Dispute[]              @relation("DisputesResolved")
   notifications      Notification[]
   files              File[]
+  profilePhotoFile   File?                  @relation("UserProfilePhoto", fields: [profilePhotoFileId], references: [id], onDelete: SetNull)
   refreshTokens      RefreshToken[]
 
   @@map("users")
@@ -230,6 +245,11 @@ model File {
   entityId     String?    @map("entity_id") @db.Uuid
   createdAt    DateTime   @default(now()) @map("created_at")
   owner        User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  pickupForRequests  DeliveryRequest[] @relation("PickupPhoto")
+  deliveryForRequests DeliveryRequest[] @relation("DeliveryPhoto")
+  itemPhotosForRequests DeliveryRequestItemPhoto[]
+  profilePhotoForUser User?             @relation("UserProfilePhoto")
+  cityImages         CityImage[]
 
   @@index([ownerId])
   @@index([module, entityType, entityId])
@@ -291,8 +311,10 @@ model Journey {
   travelerId          String        @map("traveler_id") @db.Uuid
   originCountry       String        @map("origin_country") @db.Char(2)
   originCity          String        @map("origin_city")
+  originCityId        String?       @map("origin_city_id") @db.Uuid
   destinationCountry  String        @map("destination_country") @db.Char(2)
   destinationCity     String        @map("destination_city")
+  destinationCityId   String?       @map("destination_city_id") @db.Uuid
   departureDate       DateTime      @map("departure_date") @db.Date
   arrivalDate         DateTime      @map("arrival_date") @db.Date
   flightNumber        String?       @map("flight_number")
@@ -301,12 +323,23 @@ model Journey {
   currency            String        @default("USD") @db.Char(3)
   notes               String?
   status              JourneyStatus @default(UPCOMING)
+  travelPhase         TravelPhase   @default(SCHEDULED) @map("travel_phase")
+  expectedLandingAt   DateTime?     @map("expected_landing_at")
+  actualLandingAt     DateTime?     @map("actual_landing_at")
+  rendezvousAddress   String?       @map("rendezvous_address")
+  rendezvousNotes     String?       @map("rendezvous_notes")
+  lastTravelUpdateAt  DateTime?     @map("last_travel_update_at")
+  travelUpdateNote    String?       @map("travel_update_note")
   createdAt           DateTime      @default(now()) @map("created_at")
   updatedAt           DateTime      @updatedAt @map("updated_at")
   traveler            User          @relation("TravelerJourneys", fields: [travelerId], references: [id], onDelete: Cascade)
+  originCityRef       City?         @relation("OriginCity", fields: [originCityId], references: [id], onDelete: SetNull)
+  destinationCityRef  City?         @relation("DestinationCity", fields: [destinationCityId], references: [id], onDelete: SetNull)
   deliveryRequests    DeliveryRequest[]
 
   @@index([originCountry, destinationCountry, departureDate])
+  @@index([originCityId])
+  @@index([destinationCityId])
   @@map("journeys")
 }
 
@@ -340,6 +373,10 @@ model DeliveryRequest {
   status           RequestStatus @default(PENDING)
   pickupPhotoUrl   String?       @map("pickup_photo_url")
   deliveryPhotoUrl String?       @map("delivery_photo_url")
+  pickupPhotoFileId String?      @map("pickup_photo_file_id") @db.Uuid
+  deliveryPhotoFileId String?    @map("delivery_photo_file_id") @db.Uuid
+  pickupRendezvousAddress String? @map("pickup_rendezvous_address")
+  deliveryRendezvousAddress String? @map("delivery_rendezvous_address")
   pickupConfirmedAt DateTime?    @map("pickup_confirmed_at")
   deliveredAt      DateTime?     @map("delivered_at")
   createdAt        DateTime      @default(now()) @map("created_at")
@@ -351,6 +388,9 @@ model DeliveryRequest {
   itemCategory   ItemCategory?         @relation(fields: [itemCategoryId], references: [id])
   pickupAddress  Address?              @relation("PickupAddress", fields: [pickupAddressId], references: [id])
   dropoffAddress Address?              @relation("DropoffAddress", fields: [dropoffAddressId], references: [id])
+  pickupPhotoFile File?                 @relation("PickupPhoto", fields: [pickupPhotoFileId], references: [id], onDelete: SetNull)
+  deliveryPhotoFile File?               @relation("DeliveryPhoto", fields: [deliveryPhotoFileId], references: [id], onDelete: SetNull)
+  itemPhotos     DeliveryRequestItemPhoto[]
   statusEvents   DeliveryStatusEvent[]
   transactions   Transaction[]
   insurance      InsurancePolicy?
@@ -362,6 +402,18 @@ model DeliveryRequest {
   @@index([travelerId])
   @@index([status])
   @@map("delivery_requests")
+}
+
+model DeliveryRequestItemPhoto {
+  id                String          @id @default(uuid()) @db.Uuid
+  deliveryRequestId String          @map("delivery_request_id") @db.Uuid
+  fileId            String          @map("file_id") @db.Uuid
+  sortOrder         Int             @default(0) @map("sort_order")
+  deliveryRequest   DeliveryRequest @relation(fields: [deliveryRequestId], references: [id], onDelete: Cascade)
+  file              File            @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([deliveryRequestId, fileId])
+  @@map("delivery_request_item_photos")
 }
 
 model DeliveryStatusEvent {
@@ -450,6 +502,7 @@ model Notification {
   id        String              @id @default(uuid()) @db.Uuid
   userId    String              @map("user_id") @db.Uuid
   channel   NotificationChannel
+  eventType String              @default("legacy.manual") @map("event_type")
   title     String
   body      String?
   isRead    Boolean             @default(false) @map("is_read")
@@ -458,6 +511,7 @@ model Notification {
   user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
+  @@index([userId, eventType])
   @@map("notifications")
 }
 
@@ -467,6 +521,61 @@ model Country {
   code     String  @id @db.Char(2)
   name     String
   currency String? @db.Char(3)
+  cities   City[]
 
   @@map("countries")
+}
+
+model City {
+  id             String     @id @default(uuid()) @db.Uuid
+  seedKey        String?    @unique @map("seed_key")
+  name           String
+  countryCode    String     @map("country_code") @db.Char(2)
+  timezone       String
+  latitude       Decimal    @db.Decimal(9, 6)
+  longitude      Decimal    @db.Decimal(9, 6)
+  airportCode    String?    @map("airport_code") @db.Char(3)
+  contactEmail   String?    @map("contact_email")
+  contactPhone   String?    @map("contact_phone")
+  contactAddress String?    @map("contact_address")
+  notes          String?
+  enabled        Boolean    @default(true)
+  sortOrder      Int        @default(0) @map("sort_order")
+  source         CitySource @default(MANUAL)
+  seedLocked     Boolean    @default(false) @map("seed_locked")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  country              Country  @relation(fields: [countryCode], references: [code])
+  originJourneys       Journey[] @relation("OriginCity")
+  destinationJourneys  Journey[] @relation("DestinationCity")
+  images               CityImage[]
+
+  @@index([countryCode, enabled])
+  @@index([enabled, sortOrder])
+  @@map("cities")
+}
+
+model CityImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  cityId    String   @map("city_id") @db.Uuid
+  fileId    String   @map("file_id") @db.Uuid
+  sortOrder Int      @default(0) @map("sort_order")
+  caption   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  file File @relation(fields: [fileId], references: [id], onDelete: Restrict)
+
+  @@unique([cityId, fileId])
+  @@index([cityId, sortOrder])
+  @@map("city_images")
+}
+
+model CitySeedExclusion {
+  seedKey      String   @id @map("seed_key")
+  excludedAt   DateTime @default(now()) @map("excluded_at")
+  excludedById String?  @map("excluded_by_id") @db.Uuid
+
+  @@map("city_seed_exclusions")
 }

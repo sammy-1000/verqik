@@ -9,6 +9,10 @@ export class RbacService {
     return this.repository.getUserPermissions(userId);
   }
 
+  getUserRoles(userId: string) {
+    return this.repository.getUserRoles(userId);
+  }
+
   assignRole(userId: string, roleName: string) {
     return this.repository.assignRole(userId, roleName);
   }

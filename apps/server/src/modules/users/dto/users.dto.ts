@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
@@ -16,6 +16,11 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   profilePhotoUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  profilePhotoFileId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -47,4 +52,15 @@ export class CreateAddressDto {
   @IsOptional()
   @IsString()
   postalCode?: string;
+}
+
+export class SubmitVerificationDto {
+  @IsString()
+  idDocumentType: string;
+
+  @IsUUID()
+  idDocumentFileId: string;
+
+  @IsUUID()
+  selfieFileId: string;
 }
