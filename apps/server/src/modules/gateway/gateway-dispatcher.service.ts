@@ -7,6 +7,7 @@ import {
 import type { AuthUser } from '@verqik/common';
 import { resolveAppError } from '@verqik/common';
 import { AdminCitiesService } from '../admin/admin-cities.service';
+import { AdminUsersService } from '../admin/admin-users.service';
 import { AdminVerificationsService } from '../admin/admin-verifications.service';
 import { AuthService } from '../auth/auth.service';
 import { DeliveryService } from '../delivery/delivery.service';
@@ -57,6 +58,7 @@ export class GatewayDispatcherService {
     private readonly journeysQuery: JourneysQueryService,
     private readonly adminVerificationsService: AdminVerificationsService,
     private readonly adminCitiesService: AdminCitiesService,
+    private readonly adminUsersService: AdminUsersService,
   ) {
     this.registerPublicHandlers();
     this.registerAuthenticatedHandlers();
@@ -362,6 +364,14 @@ export class GatewayDispatcherService {
     });
     h.set(GatewayEvents.ADMIN_CITIES_DELETE, (u, p) =>
       this.adminCitiesService.remove(String(p.cityId), u.id),
+    );
+
+    // Admin users
+    h.set(GatewayEvents.ADMIN_USERS_LIST, (_u, p) =>
+      this.adminUsersService.list({ q: p.q as string | undefined }),
+    );
+    h.set(GatewayEvents.ADMIN_USERS_CREATE, (_u, p) =>
+      this.adminUsersService.createAdmin(p as never),
     );
   }
 }

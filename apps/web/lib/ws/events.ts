@@ -38,6 +38,8 @@ export const WsEvents = {
   ADMIN_CITIES_CREATE: "admin:cities:create",
   ADMIN_CITIES_UPDATE: "admin:cities:update",
   ADMIN_CITIES_DELETE: "admin:cities:delete",
+  ADMIN_USERS_LIST: "admin:users:list",
+  ADMIN_USERS_CREATE: "admin:users:create",
   ROOM_JOIN: "room:join",
 } as const;
 

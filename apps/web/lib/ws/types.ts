@@ -237,6 +237,24 @@ export interface AdminVerificationDetail extends AdminVerificationRecord {
   };
 }
 
+export interface AdminUserRecord {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  profileType: "SENDER" | "TRAVELER" | "BOTH";
+  isActive: boolean;
+  createdAt: string;
+  roles: string[];
+  verificationStatus: "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
+}
+
+export interface AdminUserCreateResult extends AdminUserRecord {
+  created: boolean;
+  passwordUpdated: boolean;
+  promoted: boolean;
+}
+
 export interface RequestUploadPayload {
   filename: string;
   mimeType: string;

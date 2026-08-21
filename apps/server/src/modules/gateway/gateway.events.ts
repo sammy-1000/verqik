@@ -90,6 +90,10 @@ export const GatewayEvents = {
   ADMIN_CITIES_CREATE: 'admin:cities:create',
   ADMIN_CITIES_UPDATE: 'admin:cities:update',
   ADMIN_CITIES_DELETE: 'admin:cities:delete',
+
+  // Admin users
+  ADMIN_USERS_LIST: 'admin:users:list',
+  ADMIN_USERS_CREATE: 'admin:users:create',
 } as const;
 
 export type GatewayEvent =
@@ -171,5 +175,7 @@ export const EVENT_PERMISSIONS: Partial<Record<string, string[]>> = {
   [GatewayEvents.ADMIN_CITIES_CREATE]: ['cities:manage'],
   [GatewayEvents.ADMIN_CITIES_UPDATE]: ['cities:manage'],
   [GatewayEvents.ADMIN_CITIES_DELETE]: ['cities:manage'],
+  [GatewayEvents.ADMIN_USERS_LIST]: ['users:manage'],
+  [GatewayEvents.ADMIN_USERS_CREATE]: ['users:manage'],
   [GatewayEvents.ROOM_JOIN]: ['delivery:read'],
 };
