@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Bell, CircleHelp, LogOut, ScrollText, UserPen } from "lucide-react";
+import { Bell, CircleHelp, LogOut, ScrollText, ShieldCheck, UserPen } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { UserDisplay } from "@/components/user/user-display";
-import { APP_PROFILE_PATH } from "@/lib/app/routes";
+import { APP_PROFILE_PATH, APP_VERIFICATION_PATH } from "@/lib/app/routes";
 import { wsClient } from "@/lib/ws/client";
 import { WsEvents, PushEvents } from "@/lib/ws/events";
 import type { NotificationRecord, UserProfile } from "@/lib/ws/types";
@@ -68,6 +68,7 @@ export function AppHeader({ user }: { user: UserProfile }) {
 
   const initials = `${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase();
   const admin = isAdminUser(user);
+  const showVerificationMenu = !admin;
 
   return (
     <header className="border-border/60 bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
@@ -184,6 +185,16 @@ export function AppHeader({ user }: { user: UserProfile }) {
                   <UserPen className="size-4" />
                   Edit profile
                 </DropdownMenuItem>
+                {showVerificationMenu ? (
+                  <DropdownMenuItem
+                    className="gap-2 py-2"
+                    nativeButton={false}
+                    render={<Link href={APP_VERIFICATION_PATH} />}
+                  >
+                    <ShieldCheck className="size-4" />
+                    Verification
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem
                   className="gap-2 py-2"
                   nativeButton={false}

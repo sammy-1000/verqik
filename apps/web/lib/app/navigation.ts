@@ -40,7 +40,12 @@ export const ADMIN_SECTIONS: Array<{
   },
 ];
 
-const HOME_BLOCKS: AppBlockType[] = ["welcome", "verification", "recent-journeys"];
+const HOME_BLOCKS: AppBlockType[] = [
+  "welcome",
+  "verification-cta",
+  "publish-journey-cta",
+  "recent-journeys",
+];
 const TRAVELS_BLOCKS: AppBlockType[] = [
   "create-journey",
   "my-journeys",

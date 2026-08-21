@@ -34,6 +34,17 @@ const ALL_BLOCKS: AppBlock[] = [
     permission: "cities:manage",
   },
   {
+    id: "publish-journey-cta",
+    type: "publish-journey-cta",
+    for: ["TRAVELER", "BOTH"],
+  },
+  {
+    id: "verification-cta",
+    type: "verification-cta",
+    for: ["SENDER", "TRAVELER", "BOTH"],
+    hideForAdmin: true,
+  },
+  {
     id: "verification",
     type: "verification",
     title: "Identity verification",

@@ -2,6 +2,8 @@ import type { UserProfile } from "@/lib/ws/types";
 
 export type AppBlockType =
   | "welcome"
+  | "verification-cta"
+  | "publish-journey-cta"
   | "verification"
   | "verification-review"
   | "admin-users"
