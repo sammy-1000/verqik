@@ -4,6 +4,7 @@ export type AppBlockType =
   | "welcome"
   | "verification-cta"
   | "publish-journey-cta"
+  | "my-travels-preview"
   | "verification"
   | "verification-review"
   | "admin-users"

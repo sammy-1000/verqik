@@ -44,6 +44,7 @@ const HOME_BLOCKS: AppBlockType[] = [
   "welcome",
   "verification-cta",
   "publish-journey-cta",
+  "my-travels-preview",
   "recent-journeys",
 ];
 const TRAVELS_BLOCKS: AppBlockType[] = [

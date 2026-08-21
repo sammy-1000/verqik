@@ -3,6 +3,7 @@
 import type { AppBlock } from "@/lib/app/types";
 import type { UserProfile } from "@/lib/ws/types";
 import { WelcomeBlock } from "@/components/app/blocks/welcome-block";
+import { MyTravelsPreviewBlock } from "@/components/app/blocks/my-travels-preview-block";
 import { PublishJourneyCtaBlock } from "@/components/app/blocks/publish-journey-cta-block";
 import { VerificationCtaBlock } from "@/components/app/blocks/verification-cta-block";
 import { VerificationBlock } from "@/components/app/blocks/verification-block";
@@ -31,6 +32,8 @@ export function AppBlockRenderer({
       return <VerificationCtaBlock user={user} />;
     case "publish-journey-cta":
       return <PublishJourneyCtaBlock user={user} />;
+    case "my-travels-preview":
+      return <MyTravelsPreviewBlock />;
     case "verification":
       return <VerificationBlock user={user} block={block} />;
     case "verification-review":

@@ -34,6 +34,11 @@ const ALL_BLOCKS: AppBlock[] = [
     permission: "cities:manage",
   },
   {
+    id: "my-travels-preview",
+    type: "my-travels-preview",
+    for: ["TRAVELER", "BOTH"],
+  },
+  {
     id: "publish-journey-cta",
     type: "publish-journey-cta",
     for: ["TRAVELER", "BOTH"],
