@@ -47,8 +47,6 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/database/package.json ./packages/database/package.json
 COPY packages/database/prisma ./packages/database/prisma
-COPY packages/database/src/migrate.ts ./packages/database/src/migrate.ts
-COPY packages/database/src/migrate-cli.ts ./packages/database/src/migrate-cli.ts
 COPY packages/common/package.json ./packages/common/package.json
 COPY packages/email/package.json ./packages/email/package.json
 COPY packages/storage/package.json ./packages/storage/package.json
@@ -62,7 +60,7 @@ COPY --from=builder /app/packages/email/dist ./packages/email/dist
 COPY --from=builder /app/packages/storage/dist ./packages/storage/dist
 COPY --from=builder /app/apps/server/dist ./apps/server/dist
 
-RUN pnpm --filter @verqik/database db:generate
+RUN pnpm --filter @verqik/database exec prisma generate
 
 COPY apps/server/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
