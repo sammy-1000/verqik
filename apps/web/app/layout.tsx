@@ -6,6 +6,7 @@ import {
 
 import "@workspace/ui/globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
+import { PublicEnvScript } from "@/components/providers/public-env-script";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-svh">
+        <PublicEnvScript />
         <ThemeProvider>
           <AppProviders>{children}</AppProviders>
         </ThemeProvider>

@@ -2,11 +2,9 @@
 
 import { io, type Socket } from "socket.io-client";
 import { AppError, isAppErrorBody } from "@/lib/errors/app-error";
+import { getWsUrl } from "@/lib/env/public-env";
 import { PushEvents, type WsEvent } from "./events";
 import type { RpcResponse } from "./types";
-
-const WS_URL =
-  process.env.NEXT_PUBLIC_WS_URL ?? "http://localhost:3001";
 
 type PushHandler = (payload: unknown) => void;
 
@@ -31,7 +29,7 @@ class WsClient {
       return this.socket;
     }
 
-    this.socket = io(WS_URL, {
+    this.socket = io(getWsUrl(), {
       transports: ["websocket"],
       auth: this.token ? { token: this.token } : undefined,
       autoConnect: true,
