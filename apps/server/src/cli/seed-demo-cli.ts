@@ -7,6 +7,7 @@ import {
   DEMO_EMAIL_DOMAIN,
   DEMO_USERS,
 } from '../seed/demo-seed.data';
+import { CityImagesService } from '../modules/reference/city-images.service';
 import { SeedCliModule } from '../seed/seed-cli.module';
 import { DemoSeedService } from '../seed/demo-seed.service';
 
@@ -72,6 +73,9 @@ async function main() {
   });
 
   try {
+    console.log('Seeding city images to storage...');
+    await app.get(CityImagesService).ensureSeedImages();
+
     const seeder = app.get(DemoSeedService);
     const result = await seeder.run({
       password: args.password,

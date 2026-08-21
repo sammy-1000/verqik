@@ -131,16 +131,25 @@ export class CityImagesService {
 
   findSeedAssetsDir() {
     const candidates = [
-      join(process.cwd(), 'packages/database/seed-assets/cities'),
       join(process.cwd(), '../../packages/database/seed-assets/cities'),
-      join(__dirname, '../../../../packages/database/seed-assets/cities'),
+      join(process.cwd(), 'packages/database/seed-assets/cities'),
       join(__dirname, '../../../../../packages/database/seed-assets/cities'),
+      join(__dirname, '../../../../packages/database/seed-assets/cities'),
     ];
-    return candidates.find((dir) => existsSync(dir));
+    const dir = candidates.find((candidate) => existsSync(candidate));
+    if (!dir) {
+      this.logger.warn(
+        `City seed assets directory not found (cwd=${process.cwd()}). ` +
+          'Will try Wikipedia fallback for missing images.',
+      );
+    }
+    return dir;
   }
 
   /** Idempotent — uploads bundled seed assets and links File records by storage key. */
   async ensureSeedImages() {
+    const assetsDir = this.findSeedAssetsDir();
+
     const cities = await this.prisma.city.findMany({
       where: { seedKey: { not: null } },
       select: {
@@ -152,7 +161,8 @@ export class CityImagesService {
       },
     });
 
-    const assetsDir = this.findSeedAssetsDir();
+    let seeded = 0;
+    let skipped = 0;
 
     for (const city of cities) {
       if (!city.seedKey || city.images.length > 0) continue;
@@ -168,7 +178,11 @@ export class CityImagesService {
         body = await this.fetchWikipediaImage(city.name, city.countryCode);
       }
 
-      if (!body) continue;
+      if (!body) {
+        skipped++;
+        this.logger.warn(`No city image source for ${city.seedKey}`);
+        continue;
+      }
 
       const key = citySeedImageKey(city.seedKey);
 
@@ -213,8 +227,13 @@ export class CityImagesService {
         create: { cityId: city.id, fileId: file.id, sortOrder: 0 },
       });
 
+      seeded++;
       this.logger.log(`Seeded image for city ${city.seedKey}`);
     }
+
+    this.logger.log(
+      `City image seed complete: ${seeded} uploaded, ${skipped} missing sources`,
+    );
   }
 
   private async fetchWikipediaImage(cityName: string, countryCode: string) {

@@ -1,13 +1,13 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CityImagesService } from '../reference/city-images.service';
 
 @Injectable()
-export class CityImagesBootstrapService implements OnModuleInit {
+export class CityImagesBootstrapService implements OnApplicationBootstrap {
   private readonly logger = new Logger(CityImagesBootstrapService.name);
 
   constructor(private readonly cityImages: CityImagesService) {}
 
-  async onModuleInit() {
+  async onApplicationBootstrap() {
     try {
       await this.cityImages.ensureSeedImages();
     } catch (err) {
