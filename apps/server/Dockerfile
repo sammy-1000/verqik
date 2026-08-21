@@ -47,6 +47,7 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/database/package.json ./packages/database/package.json
 COPY packages/database/prisma ./packages/database/prisma
+COPY packages/database/seed-assets ./packages/database/seed-assets
 COPY packages/common/package.json ./packages/common/package.json
 COPY packages/email/package.json ./packages/email/package.json
 COPY packages/storage/package.json ./packages/storage/package.json

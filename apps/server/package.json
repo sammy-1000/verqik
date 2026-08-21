@@ -25,7 +25,8 @@
     "db:migrate:deploy": "pnpm --filter @verqik/database db:migrate:deploy",
     "db:seed": "pnpm --filter @verqik/database db:seed",
     "admin:create": "tsx src/cli/create-admin-cli.ts",
-    "seed:demo": "nest build && node dist/cli/seed-demo-cli.js"
+    "seed:demo": "node dist/cli/seed-demo-cli.js",
+    "seed:demo:build": "nest build && node dist/cli/seed-demo-cli.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
