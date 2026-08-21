@@ -89,11 +89,7 @@ export class CityImagesService {
   }
 
   async resolveFileUrl(key: string) {
-    try {
-      return await this.storage.getPresignedDownloadUrl(key, 60 * 60 * 24 * 7);
-    } catch {
-      return this.storage.resolveUrl(key);
-    }
+    return this.storage.getDownloadUrl(key, 60 * 60 * 24 * 7);
   }
 
   async syncCityImages(cityId: string, fileIds: string[], ownerId?: string) {

@@ -40,13 +40,36 @@ export class StorageService {
 
   resolveUrl(key: string): string {
     if (this.cdnUrl) {
-      return `${this.cdnUrl.replace(/\/$/, '')}/${this.bucket}/${key}`;
+      const base = this.cdnUrl.replace(/\/$/, '');
+      // CDN base may already include the bucket path (e.g. https://cdn.example.com/verqik-dev)
+      if (this.cdnBaseIncludesBucket()) {
+        return `${base}/${key}`;
+      }
+      return `${base}/${this.bucket}/${key}`;
     }
     if (this.options.endpoint) {
       const base = this.options.endpoint.replace(/\/$/, '');
       return `${base}/${this.bucket}/${key}`;
     }
     return `https://${this.bucket}.s3.${this.options.region}.amazonaws.com/${key}`;
+  }
+
+  /** Public read URL — CDN when configured, otherwise presigned S3 URL */
+  async getDownloadUrl(key: string, expiresIn = 3600): Promise<string> {
+    if (this.cdnUrl) {
+      return this.resolveUrl(key);
+    }
+    return this.getPresignedDownloadUrl(key, expiresIn);
+  }
+
+  hasCdn(): boolean {
+    return Boolean(this.cdnUrl);
+  }
+
+  private cdnBaseIncludesBucket(): boolean {
+    if (!this.cdnUrl) return false;
+    const base = this.cdnUrl.replace(/\/$/, '');
+    return base.endsWith(`/${this.bucket}`) || base.endsWith(this.bucket);
   }
 
   buildKey(module: string, filename: string): string {

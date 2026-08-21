@@ -75,7 +75,7 @@ export class FilesService {
       throw new ForbiddenException('Not your file');
     }
 
-    const url = await this.storage.getPresignedDownloadUrl(file.key);
+    const url = await this.storage.getDownloadUrl(file.key);
     return { url, file };
   }
 
@@ -136,7 +136,7 @@ export class FilesService {
   async getPresignedUrl(fileId: string) {
     const file = await this.repository.findById(fileId);
     if (!file || file.status !== FileStatus.UPLOADED) return null;
-    return this.storage.getPresignedDownloadUrl(file.key);
+    return this.storage.getDownloadUrl(file.key);
   }
 
   async getAdminDownloadUrl(fileId: string) {
@@ -146,7 +146,7 @@ export class FilesService {
       throw new BadRequestException('File not available');
     }
 
-    const url = await this.storage.getPresignedDownloadUrl(file.key);
+    const url = await this.storage.getDownloadUrl(file.key);
     return { url, file };
   }
 }
